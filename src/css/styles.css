@@ -1,0 +1,100 @@
+#mediaBar {
+    -fx-background-color: black;
+}
+
+.mediaLabel {
+    -fx-text-fill: white;
+}
+
+#episodeTitleLabel {
+    -fx-text-fill: #a5973e;
+    -fx-font-weight: bolder;
+    -fx-font-size: 14px;
+}
+
+#episodeDateLabel, #episodeDurationLabel {
+    -fx-font-size: 10px;
+}
+
+.channelList, .episodeList {
+    -fx-padding: 0px;
+    -fx-border-width: 0px;
+    -fx-background-insets: 0;
+}
+
+.channelList .list-cell {
+    -fx-control-inner-background: black;
+    -fx-padding: 0px;
+}
+
+.channelList .list-cell:focused {
+    -fx-background-color: transparent;
+}
+
+.channelList:focused {
+    -fx-background-color: transparent;
+}
+
+.channelList .list-cell:selected {
+    -fx-background-color: #a5973e;
+}
+
+.episodeList .list-cell:even {
+    -fx-background-color: #242424;
+    -fx-text-fill: white;
+}
+
+.episodeList .list-cell:odd {
+    -fx-background-color: #353535;
+//    -fx-text-fill: white;
+}
+
+.episodeList .list-cell:selected {
+    -fx-background-color: #545454;
+}
+
+.episodeList:focused {
+    -fx-background-color: transparent;
+}
+
+.mediaBtnClass {
+//    -fx-background-color: aqua;
+    -fx-background-color: transparent;
+    -fx-background-size: 30px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 90%;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 30px;
+}
+
+#playBtn {
+    -fx-background-image: url('../images/play.png');
+
+}
+
+#pauseBtn {
+    -fx-background-image: url('../images/pause.png');
+}
+
+#volumeLabel {
+    -fx-background-image: url('../images/volume-3.png');
+    -fx-background-color: transparent;
+    -fx-background-size: 20px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 90%;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+}
+
+.downloadBtnClass {
+    -fx-background-color: transparent;
+    -fx-background-size: 20px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 90%;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+}
+
+#downloadBtn {
+    -fx-background-image: url('../images/Button-Download-icon.png');
+}
