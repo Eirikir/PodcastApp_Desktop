@@ -1,4 +1,4 @@
-package podcast_application;
+package podcast_application.singletons;
 
 import javafx.util.Duration;
 

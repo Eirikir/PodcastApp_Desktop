@@ -43,7 +43,7 @@ public class PodcastChannel extends ImageView {
 
     private void populateList(List<Item> list) {
         for (Item m : list)
-            episodes.add(new PodcastEpisode(m));
+            episodes.add(new PodcastEpisode(m, directory.getPath()));
     }
 
     public List<PodcastEpisode> getEpisodes() {

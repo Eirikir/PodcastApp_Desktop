@@ -1,7 +1,7 @@
 package podcast_application.xml.write;
 
 
-import podcast_application.Formatter;
+import podcast_application.singletons.Formatter;
 import podcast_application.media.gui.PodcastEpisode;
 
 import java.io.FileOutputStream;

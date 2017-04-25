@@ -1,15 +1,23 @@
 package podcast_application.media.gui;
 
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.util.Duration;
-import podcast_application.Formatter;
+import podcast_application.singletons.DownloadManager;
+import podcast_application.singletons.Formatter;
 import podcast_application.xml.model.Item;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -18,8 +26,11 @@ public class PodcastEpisode extends VBox {
     private String fileName;
     private String title, description, pubDate, link;
     private Duration progress, duration;
+    private boolean downloading = false;
+    private Button fileBtn;
+    private File localFile;
 
-    public PodcastEpisode(Item item) {
+    public PodcastEpisode(Item item, String basePath) {
         super();
 
         title = item.getTitle();
@@ -27,6 +38,10 @@ public class PodcastEpisode extends VBox {
         pubDate = item.getDate();
 //        episode = new Media(item.getLink());
         link = item.getLink();
+        fileName = parseFileName();
+
+        // set local file location
+        localFile = new File(basePath+"/"+fileName);
 
         progress = Formatter.STRING_TO_DURATION(item.getProgress());
         duration = Formatter.STRING_TO_DURATION(item.getDuration());
@@ -39,10 +54,11 @@ public class PodcastEpisode extends VBox {
         titleLabel.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(titleLabel, Priority.ALWAYS);
 
-        Button downloadBtn = new Button();
-        downloadBtn.getStyleClass().add("downloadBtnClass");
-        downloadBtn.setId("downloadBtn");
-        headBox.getChildren().addAll(titleLabel, downloadBtn);
+        createFileBtn();
+
+
+        headBox.getChildren().addAll(titleLabel, fileBtn);
+
 
         HBox subBox = new HBox(10);
         Label dateLabel = new Label(Formatter.FORMAT_DATE(pubDate));
@@ -58,6 +74,61 @@ public class PodcastEpisode extends VBox {
         subBox.getChildren().addAll(dateLabel, durationLabel);
 
         this.getChildren().addAll(headBox, subBox);
+
+    }
+
+    // set up file button; download / delete depending upon whether local file exists
+    private void createFileBtn() {
+        fileBtn = new Button();
+        fileBtn.getStyleClass().add("fileBtnClass");
+
+//        File tmp = new File("./Podcasts/StarTalk Radio/"+fileName);
+
+        if(localFile.exists()) {
+            episode = new Media(localFile.toURI().toString());
+            fileBtn.setId("deleteBtn");
+        }
+        else {
+            fileBtn.setId("downloadBtn");
+        }
+
+        fileBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+
+                if(localFile.exists()) { // delete file
+                    localFile.delete();
+                    fileBtn.setId("downloadBtn");
+
+                    // nullify media source
+                    episode = null;
+                } else {    // download file
+                    if(!downloading)
+                        downloadFile();
+                }
+
+            }
+        });
+    }
+
+    public void returnValueFromDownload(int value) {
+        if(value == 1) {
+            fileBtn.setId("deleteBtn");
+            episode = episode = new Media(localFile.toURI().toString());
+        }
+        downloading = false;
+    }
+
+    private void downloadFile() {
+        downloading = true;
+        System.out.println("Downloading file: "+fileName);
+        fileBtn.setId("downloadingBtn");
+        DownloadManager.getInstance().addTask(link, localFile, this);
+    }
+
+    private String parseFileName() {
+        int idx = link.lastIndexOf("/");
+        return link.substring(idx + 1);
     }
 
     public Media getAsMedia() {

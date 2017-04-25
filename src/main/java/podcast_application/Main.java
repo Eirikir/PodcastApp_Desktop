@@ -6,6 +6,8 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import podcast_application.singletons.DownloadManager;
+import podcast_application.synchronization.dropbox.DropboxSync;
 
 public class Main extends Application {
     //    private static final String MEDIA_URL =
@@ -29,12 +31,16 @@ public class Main extends Application {
         primaryStage.show();
 
 //        new TestRAF();
+//        new DropboxSync();
     }
 
     @Override
     public void stop() {
         //       System.out.println("Exiting");
-        mediaControl.save();
+        if(mediaControl.getHasBeenStarted())
+            mediaControl.save();
+        mediaControl.stopMediaPlayer();
+        DownloadManager.getInstance().shutDownManager(); // stops executorservice
     }
 
 

@@ -183,6 +183,13 @@ public class MediaControl extends BorderPane {
     public void save() {
         currentChannel.saveEpisodes();
         System.out.println("Save done!");
+
     }
 
+    public void stopMediaPlayer() {
+        mediaPlayer.stop();
+        mediaPlayer.dispose();
+    }
+
+    public boolean getHasBeenStarted() { return hasStarted; }
 }

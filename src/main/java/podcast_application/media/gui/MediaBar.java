@@ -16,7 +16,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import podcast_application.Formatter;
+import podcast_application.singletons.Formatter;
 
 public class MediaBar extends HBox {
     private MediaPlayer mediaPlayer;

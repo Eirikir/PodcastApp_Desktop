@@ -86,7 +86,7 @@
     -fx-pref-height: 20px;
 }
 
-.downloadBtnClass {
+.fileBtnClass {
     -fx-background-color: transparent;
     -fx-background-size: 20px;
     -fx-background-repeat: no-repeat;
@@ -97,4 +97,12 @@
 
 #downloadBtn {
     -fx-background-image: url('../images/Button-Download-icon.png');
+}
+
+#downloadingBtn {
+    -fx-background-image: url('../images/hourglass.png');
+}
+
+#deleteBtn {
+    -fx-background-image: url('../images/error.png');
 }
