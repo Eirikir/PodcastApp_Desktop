@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import podcast_application.singletons.DownloadManager;
-import podcast_application.synchronization.dropbox.DropboxSync;
 
 public class Main extends Application {
     //    private static final String MEDIA_URL =
@@ -17,11 +16,10 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         primaryStage.setTitle("Podcast Player");
-        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/images/microphone-1.png")));
+        primaryStage.getIcons().add(new Image("/images/microphone-1.png"));
         Group root = new Group();
         Scene scene = new Scene(root, 640, 341);
-        String css = this.getClass().getResource("/css/styles.css").toExternalForm();
-        scene.getStylesheets().add(css);
+        scene.getStylesheets().add("/css/styles.css");
 
 
         mediaControl = new MediaControl();

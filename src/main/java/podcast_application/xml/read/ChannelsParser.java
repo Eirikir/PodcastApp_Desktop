@@ -1,6 +1,9 @@
 package podcast_application.xml.read;
 
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import podcast_application.singletons.WriteDefaultFiles;
 import podcast_application.xml.model.Channel;
 
 import javax.xml.stream.XMLEventReader;
@@ -8,14 +11,45 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChannelsParser {
     private final String ITEM = "item", TITLE = "title", LINK = "link", DESCRIPTION = "description", LANGUAGE = "language",
             DATE = "date", IMAGE = "image";
+
+    public ChannelsParser() {
+        // set up directories and files, if there are none
+        File baseDir = new File("./Podcasts");
+        if(!baseDir.exists()) {
+            baseDir.mkdir();
+            new WriteDefaultFiles(baseDir.getPath());
+ //           writeDefaultChannels();
+        }
+
+
+
+    }
+
+    private void writeDefaultChannels() {
+        InputStream is = null;
+        OutputStream out = null;
+        try {
+            is = getClass().getResourceAsStream("/defaultFiles/channels.xml");
+            out = new FileOutputStream("./Allo/channels.xml");
+
+            int read = 0;
+            byte[] bytes = new byte[512];
+            while((read = is.read(bytes)) != -1)
+                out.write(bytes, 0, read);
+            is.close();
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     public List<Channel> readChannels() {
         List<Channel> channels = new ArrayList<>();

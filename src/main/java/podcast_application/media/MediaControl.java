@@ -31,8 +31,7 @@ public class MediaControl extends BorderPane {
     private PodcastChannel currentChannel;
     private boolean hasStarted = false;
 
-
-    public MediaControl() {
+    private void loadChannels() {
         List<PodcastChannel> loadedChannels = new ArrayList<>();
         List<Channel> channels = new ChannelsParser().readChannels();
         for(Channel c : channels)
@@ -65,6 +64,11 @@ public class MediaControl extends BorderPane {
 
         currentChannel = loadedChannels.get(0);
         podcastChannelListView.getSelectionModel().select(0);
+    }
+
+    public MediaControl() {
+
+        loadChannels();
 
         loadEpisodes();
 

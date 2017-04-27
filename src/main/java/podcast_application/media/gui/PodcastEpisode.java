@@ -46,6 +46,9 @@ public class PodcastEpisode extends VBox {
         progress = Formatter.STRING_TO_DURATION(item.getProgress());
         duration = Formatter.STRING_TO_DURATION(item.getDuration());
 
+//        progress = Duration.ZERO;
+//        duration = Duration.minutes(5);
+
         // GUI
         HBox headBox = new HBox();
         Label titleLabel = new Label(title);
