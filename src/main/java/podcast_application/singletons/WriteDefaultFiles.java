@@ -1,9 +1,6 @@
 package podcast_application.singletons;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class WriteDefaultFiles {
     private final String BASE_TARGET_PATH,
@@ -15,13 +12,13 @@ public class WriteDefaultFiles {
     public WriteDefaultFiles(String baseTargetPath) {
         this.BASE_TARGET_PATH = baseTargetPath;
 
-        writeFile(CHANNELS_FILE_SOURCE,"/channels.xml");
+        writeFileUTF(CHANNELS_FILE_SOURCE,"/channels.xml");
 
         new File(baseTargetPath + "/StarTalk Radio/").mkdir();
-        writeFile(STARTALK_FILE_SOURCE, "/StarTalk Radio/episodes.xml");
+        writeFileUTF(STARTALK_FILE_SOURCE, "/StarTalk Radio/episodes.xml");
 
         new File(baseTargetPath + "/The Nerdist/").mkdir();
-        writeFile(NERDIST_FILE_SOURCE, "/The Nerdist/episodes.xml");
+        writeFileUTF(NERDIST_FILE_SOURCE, "/The Nerdist/episodes.xml");
     }
 
     private void writeFile(String fileSource, String fileTarget) {
@@ -36,6 +33,25 @@ public class WriteDefaultFiles {
 
             is.close();
             out.close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void writeFileUTF(String fileSource, String fileTarget) {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    getClass().getResourceAsStream(fileSource), "UTF-8"));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(BASE_TARGET_PATH + fileTarget), "UTF-8"));
+
+            String line = null;
+            while((line = reader.readLine()) != null)
+                writer.write(line);
+
+            reader.close();
+            writer.close();
 
         } catch (Exception ex) {
             ex.printStackTrace();

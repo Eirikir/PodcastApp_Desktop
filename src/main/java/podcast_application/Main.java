@@ -28,6 +28,11 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        primaryStage.setOnCloseRequest(e -> {
+            if(mediaControl.getHasBeenStarted())
+                mediaControl.save();
+        });
+
 //        new TestRAF();
 //        new DropboxSync();
     }
@@ -35,8 +40,8 @@ public class Main extends Application {
     @Override
     public void stop() {
         //       System.out.println("Exiting");
-        if(mediaControl.getHasBeenStarted())
-            mediaControl.save();
+//        if(mediaControl.getHasBeenStarted())
+//            mediaControl.save();
         mediaControl.stopMediaPlayer();
         DownloadManager.getInstance().shutDownManager(); // stops executorservice
     }

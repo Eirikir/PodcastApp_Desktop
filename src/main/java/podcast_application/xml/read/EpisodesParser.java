@@ -1,9 +1,12 @@
 package podcast_application.xml.read;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import podcast_application.xml.model.Item;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +67,7 @@ public class EpisodesParser {
 
                 }
                 // If we reach the end of an item element, we add it to the list
-                if (event.isEndElement()) {
+                else if (event.isEndElement()) {
                     EndElement endElement = event.asEndElement();
                     if (endElement.getName().getLocalPart().equals(ITEM)) {
                         items.add(item);
@@ -72,12 +75,17 @@ public class EpisodesParser {
                 }
 
             }
+
+            eventReader.close();
+            in.close();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (XMLStreamException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
         return items;
     }
 

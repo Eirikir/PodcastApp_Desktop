@@ -31,7 +31,7 @@ public class WriteEpisodes {
         XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
         // create XMLEventWriter
         XMLEventWriter eventWriter = outputFactory
-                .createXMLEventWriter(new FileOutputStream(configFile));
+                .createXMLEventWriter(new FileOutputStream(configFile), "UTF-8");
         // create an EventFactory
         XMLEventFactory eventFactory = XMLEventFactory.newInstance();
         XMLEvent end = eventFactory.createDTD("\n");

@@ -152,6 +152,7 @@ public class MediaControl extends BorderPane {
                 System.out.println("onPaused");
                 mediaBar.togglePlay(true);
                 currentEpisode.setProgress(mediaPlayer.getCurrentTime());
+//                save();
             }
         });
 
