@@ -106,3 +106,9 @@
 #deleteBtn {
     -fx-background-image: url('../images/error.png');
 }
+
+.downloadIndicator .percentage {
+    -fx-font-size: 0.916667em; /* 11pt - 1 less than the default font */
+    -fx-text-background-color: white;
+    -fx-fill: -fx-text-background-color;
+}

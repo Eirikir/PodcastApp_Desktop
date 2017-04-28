@@ -1,13 +1,14 @@
 package podcast_application.media.gui;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.media.Media;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 import podcast_application.singletons.DownloadManager;
 import podcast_application.singletons.Formatter;
@@ -21,14 +22,15 @@ import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class PodcastEpisode extends VBox {
+public class PodcastEpisode extends BorderPane {
     private Media episode = null;
-    private String fileName;
+    private String basePath, fileName;
     private String title, description, pubDate, link;
     private Duration progress, duration;
     private boolean downloading = false;
     private Button fileBtn;
     private File localFile;
+    private ProgressIndicator progressIndicator;
 
     public PodcastEpisode(Item item, String basePath) {
         super();
@@ -36,32 +38,26 @@ public class PodcastEpisode extends VBox {
         title = item.getTitle();
         description = item.getDescription();
         pubDate = item.getDate();
-//        episode = new Media(item.getLink());
         link = item.getLink();
         fileName = parseFileName();
 
         // set local file location
         localFile = new File(basePath+"/"+fileName);
+        basePath = basePath;
 
         progress = Formatter.STRING_TO_DURATION(item.getProgress());
         duration = Formatter.STRING_TO_DURATION(item.getDuration());
 
-//        progress = Duration.ZERO;
-//        duration = Duration.minutes(5);
-
         // GUI
-        HBox headBox = new HBox();
+        setUpUI();
+    }
+
+    private void setUpUI() {
+        VBox leftBox = new VBox();
         Label titleLabel = new Label(title);
-//        titleLabel.getStyleClass().add("mediaLabel");
         titleLabel.setId("episodeTitleLabel");
         titleLabel.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(titleLabel, Priority.ALWAYS);
-
-        createFileBtn();
-
-
-        headBox.getChildren().addAll(titleLabel, fileBtn);
-
 
         HBox subBox = new HBox(10);
         Label dateLabel = new Label(Formatter.FORMAT_DATE(pubDate));
@@ -73,12 +69,27 @@ public class PodcastEpisode extends VBox {
         dateLabel.setId("episodeDateLabel");
         durationLabel.setId("episodeDurationLabel");
 
-
         subBox.getChildren().addAll(dateLabel, durationLabel);
 
-        this.getChildren().addAll(headBox, subBox);
 
+        leftBox.getChildren().addAll(titleLabel, subBox);
+
+        StackPane rightBox = new StackPane();
+        rightBox.setAlignment(Pos.CENTER_RIGHT);
+        createFileBtn();
+
+        progressIndicator = new ProgressIndicator();
+        progressIndicator.getStyleClass().add("downloadIndicator");
+        progressIndicator.setVisible(false);
+
+
+        rightBox.getChildren().addAll(fileBtn, progressIndicator);
+
+        setLeft(leftBox);
+        setRight(rightBox);
     }
+
+
 
     // set up file button; download / delete depending upon whether local file exists
     private void createFileBtn() {
@@ -99,12 +110,24 @@ public class PodcastEpisode extends VBox {
             @Override
             public void handle(MouseEvent event) {
 
-                if(localFile.exists()) { // delete file
-                    localFile.delete();
-                    fileBtn.setId("downloadBtn");
+//                if(localFile == null)
+//                    localFile = new File(basePath+"/"+fileName);
 
-                    // nullify media source
-                    episode = null;
+//                System.out.println("File exists: "+localFile.exists());
+                if(localFile.exists()) { // delete file
+                    if(localFile.delete()) {
+                        System.out.println("File deleted");
+                        fileBtn.setId("downloadBtn");
+
+                        // nullify media source
+                        episode = null;
+                    } else {
+                        System.out.println("Could not delete");
+                    }
+
+
+//                    localFile = null;
+
                 } else {    // download file
                     if(!downloading)
                         downloadFile();
@@ -115,17 +138,31 @@ public class PodcastEpisode extends VBox {
     }
 
     public void returnValueFromDownload(int value) {
-        if(value == 1) {
+        if(value == 1) { // succeeded
             fileBtn.setId("deleteBtn");
             episode = episode = new Media(localFile.toURI().toString());
+
+        } else { // failed
+            fileBtn.setId("downloadBtn");
         }
+
+        progressIndicator.setVisible(false);
+        fileBtn.setVisible(true);
+
         downloading = false;
+    }
+
+    public void updateDownloadProgress(double value) {
+        progressIndicator.setProgress(value);
     }
 
     private void downloadFile() {
         downloading = true;
+        fileBtn.setVisible(false);
+        progressIndicator.setVisible(true);
+        progressIndicator.setProgress(0);
+
         System.out.println("Downloading file: "+fileName);
-        fileBtn.setId("downloadingBtn");
         DownloadManager.getInstance().addTask(link, localFile, this);
     }
 
