@@ -36,7 +36,13 @@
                     <jfxMainAppJarName>PodRunner.jar</jfxMainAppJarName>
                     <appName>PodRunner</appName>
                     <allPermissions>true</allPermissions>
+                    <bundler>EXE</bundler>
+                    <bundleArguments>
+                        <installdirChooser>true</installdirChooser>
+                    </bundleArguments>
                 </configuration>
+
+                <!-- required before build-native -->
                 <executions>
                     <execution>
                         <id>create-jfxjar</id>
@@ -45,7 +51,7 @@
                             <goal>build-jar</goal>
                         </goals>
                     </execution>
-                    <!--
+
                     <execution>
                         <id>create-native</id>
                         <phase>package</phase>
@@ -53,7 +59,7 @@
                             <goal>build-native</goal>
                         </goals>
                     </execution>
-                    -->
+
                 </executions>
             </plugin>
         </plugins>
