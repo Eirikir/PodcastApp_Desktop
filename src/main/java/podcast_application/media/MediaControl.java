@@ -74,6 +74,7 @@ public class MediaControl extends BorderPane {
 
 
         currentEpisode = currentChannel.getEpisode(0);
+        currentEpisode.toggleChosen(true);
         loadMediaPlayer();
 
 
@@ -104,7 +105,9 @@ public class MediaControl extends BorderPane {
                         hasStarted = true;
 
                     // Use listview's getSelected item
+                    currentEpisode.toggleChosen(false); // release lock on media file
                     currentEpisode = episodeListView.getSelectionModel().getSelectedItem();
+                    currentEpisode.toggleChosen(true);
                     System.out.println("Chosen: "+currentEpisode);
 
                     mediaPlayer.stop();

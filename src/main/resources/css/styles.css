@@ -99,10 +99,15 @@
     -fx-background-image: url('../images/Button-Download-icon.png');
 }
 
+#playingBtn {
+    -fx-background-image: url('../images/volume-3.png');
+}
+
+/*
 #downloadingBtn {
     -fx-background-image: url('../images/hourglass.png');
 }
-
+*/
 #deleteBtn {
     -fx-background-image: url('../images/error.png');
 }

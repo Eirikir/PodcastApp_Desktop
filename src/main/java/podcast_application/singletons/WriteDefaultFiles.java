@@ -1,6 +1,9 @@
 package podcast_application.singletons;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class WriteDefaultFiles {
     private final String BASE_TARGET_PATH,
@@ -12,33 +15,16 @@ public class WriteDefaultFiles {
     public WriteDefaultFiles(String baseTargetPath) {
         this.BASE_TARGET_PATH = baseTargetPath;
 
-        writeFileUTF(CHANNELS_FILE_SOURCE,"/channels.xml");
+        copyFiles(CHANNELS_FILE_SOURCE,"/channels.xml");
 
         new File(baseTargetPath + "/StarTalk Radio/").mkdir();
-        writeFileUTF(STARTALK_FILE_SOURCE, "/StarTalk Radio/episodes.xml");
+        copyFiles(STARTALK_FILE_SOURCE, "/StarTalk Radio/episodes.xml");
 
         new File(baseTargetPath + "/The Nerdist/").mkdir();
-        writeFileUTF(NERDIST_FILE_SOURCE, "/The Nerdist/episodes.xml");
+        copyFiles(NERDIST_FILE_SOURCE, "/The Nerdist/episodes.xml");
     }
 
-    private void writeFile(String fileSource, String fileTarget) {
-        try {
-            InputStream is = getClass().getResourceAsStream(fileSource);
-            OutputStream out = new FileOutputStream(BASE_TARGET_PATH + fileTarget);
-
-            int read = 0;
-            byte[] bytes = new byte[512];
-            while((read = is.read(bytes)) != -1)
-                out.write(bytes, 0, read);
-
-            is.close();
-            out.close();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
+    // own implementation of writing UTF-8 encoded files (NOT IN USE)
     private void writeFileUTF(String fileSource, String fileTarget) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -55,6 +41,26 @@ public class WriteDefaultFiles {
 
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    // Using Files.copy, as it preserves encoding
+    private void copyFiles(String fileSource, String fileTarget) {
+        InputStream is = null;
+        try {
+            is = getClass().getResourceAsStream(fileSource);
+            Files.copy(is, Paths.get(BASE_TARGET_PATH + fileTarget));
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            if(is != null)
+                try {
+                    is.close();
+                    System.out.println("Closing stream");
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
         }
     }
 }

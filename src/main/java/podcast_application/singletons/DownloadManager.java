@@ -19,8 +19,8 @@ public class DownloadManager {
     }
 
 
-    public void addTask(String sourcePath, File targetFile, PodcastEpisode episode) {
-        pool.submit(new DownloadTask(sourcePath, targetFile, episode));
+    public void addTask(String sourcePath, String targetPath, PodcastEpisode episode) {
+        pool.submit(new DownloadTask(sourcePath, targetPath, episode));
     }
 
     public void shutDownManager() {
@@ -42,19 +42,22 @@ public class DownloadManager {
 
 class DownloadTask implements Runnable {
     private String sourcePath;
-    private File targetFile;
+    private String targetPath;
     private PodcastEpisode episode;
 
-    public DownloadTask(String sourcePath, File targetFile, PodcastEpisode episode) {
+    public DownloadTask(String sourcePath, String targetPath, PodcastEpisode episode) {
         this.sourcePath = sourcePath;
-        this.targetFile = targetFile;
+        this.targetPath = targetPath;
         this.episode = episode;
     }
+
 
     @Override
     public void run() {
         BufferedInputStream in = null;
         FileOutputStream out = null;
+
+        int returnValue = 0;
 
         try {
             URL url = new URL(sourcePath);
@@ -68,7 +71,7 @@ class DownloadTask implements Runnable {
             }
 
             in = new BufferedInputStream(url.openStream());
-            out = new FileOutputStream(targetFile);
+            out = new FileOutputStream(targetPath);
 
             byte[] data = new byte[1024];
             int count;
@@ -85,29 +88,26 @@ class DownloadTask implements Runnable {
             }
 
 
-            episode.returnValueFromDownload(1);
+//            episode.returnValueFromDownload(1);
+            returnValue = 1;
 
-//            episode = new Media(localFile.toURI().toString());
         } catch (Exception ex) {
             ex.printStackTrace();
-            episode.returnValueFromDownload(0);
-        } finally {
-            if(in != null)
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            if(out != null)
-                try {
-                    out.flush();
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            returnValue = 0;
         }
 
+        try {
+            if(in != null)
+                in.close();
+            if(out != null) {
+                out.flush();
+                out.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        episode.returnValueFromDownload(returnValue);
     }
 
 }

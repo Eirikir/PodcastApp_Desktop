@@ -19,17 +19,23 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class PodcastEpisode extends BorderPane {
     private Media episode = null;
-    private String basePath, fileName;
+    private String fileName;
+    private Path filePath;
     private String title, description, pubDate, link;
     private Duration progress, duration;
     private boolean downloading = false;
     private Button fileBtn;
-    private File localFile;
+    // id's for file button
+    private final String ID_DOWNLOAD = "downloadBtn", ID_DELETE = "deleteBtn", ID_PLAYING = "playingBtn";
+//    private File localFile;
     private ProgressIndicator progressIndicator;
 
     public PodcastEpisode(Item item, String basePath) {
@@ -40,10 +46,11 @@ public class PodcastEpisode extends BorderPane {
         pubDate = item.getDate();
         link = item.getLink();
         fileName = parseFileName();
+        filePath = Paths.get(basePath+"/"+fileName);
 
         // set local file location
-        localFile = new File(basePath+"/"+fileName);
-        basePath = basePath;
+//        localFile = new File(filePath.toString());
+//        localFile = new File(basePath+"/"+fileName);
 
         progress = Formatter.STRING_TO_DURATION(item.getProgress());
         duration = Formatter.STRING_TO_DURATION(item.getDuration());
@@ -96,24 +103,39 @@ public class PodcastEpisode extends BorderPane {
         fileBtn = new Button();
         fileBtn.getStyleClass().add("fileBtnClass");
 
-//        File tmp = new File("./Podcasts/StarTalk Radio/"+fileName);
-
-        if(localFile.exists()) {
+/*        if(localFile.exists()) {
             episode = new Media(localFile.toURI().toString());
             fileBtn.setId("deleteBtn");
+        } */
+        if(Files.exists(filePath)) {
+//            episode = new Media(filePath.toUri().toString());
+            fileBtn.setId(ID_DELETE);
         }
         else {
-            fileBtn.setId("downloadBtn");
+            fileBtn.setId(ID_DOWNLOAD);
         }
 
         fileBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                if(fileBtn.getId().equals(ID_PLAYING)) // if file is in use
+                    return;
+                try {
+                    if (Files.deleteIfExists(filePath)) {
+                        System.out.println("File deleted");
+                        fileBtn.setId(ID_DOWNLOAD);
 
-//                if(localFile == null)
-//                    localFile = new File(basePath+"/"+fileName);
+                        // nullify media source
+                        episode = null;
+                    } else {
+                        if(!downloading)
+                            downloadFile();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-//                System.out.println("File exists: "+localFile.exists());
+/*
                 if(localFile.exists()) { // delete file
                     if(localFile.delete()) {
                         System.out.println("File deleted");
@@ -126,24 +148,37 @@ public class PodcastEpisode extends BorderPane {
                     }
 
 
-//                    localFile = null;
-
                 } else {    // download file
                     if(!downloading)
                         downloadFile();
                 }
+                */
 
             }
         });
     }
 
+
+    public void toggleChosen(boolean isChosen) {
+        if(isChosen)
+            fileBtn.setId(ID_PLAYING);
+        else if(Files.notExists(filePath))
+            fileBtn.setId(ID_DOWNLOAD);
+        else { // release lock on local file, so it may be deleted
+            episode = null;
+            fileBtn.setId(ID_DELETE);
+        }
+
+    }
+
     public void returnValueFromDownload(int value) {
         if(value == 1) { // succeeded
-            fileBtn.setId("deleteBtn");
-            episode = episode = new Media(localFile.toURI().toString());
+            fileBtn.setId(ID_DELETE);
+//            episode = episode = new Media(localFile.toURI().toString());
+//            episode = new Media(filePath.toUri().toString());
 
         } else { // failed
-            fileBtn.setId("downloadBtn");
+            fileBtn.setId(ID_DOWNLOAD);
         }
 
         progressIndicator.setVisible(false);
@@ -163,7 +198,8 @@ public class PodcastEpisode extends BorderPane {
         progressIndicator.setProgress(0);
 
         System.out.println("Downloading file: "+fileName);
-        DownloadManager.getInstance().addTask(link, localFile, this);
+//        System.out.println("Target location: "+localFile.getPath());
+        DownloadManager.getInstance().addTask(link, filePath.toString(), this);
     }
 
     private String parseFileName() {
@@ -173,9 +209,17 @@ public class PodcastEpisode extends BorderPane {
 
     public Media getAsMedia() {
         if(episode == null)
-            episode = new Media(link);
+            determineMediaSource();
         return episode;
     }
+
+    private void determineMediaSource() { // set local file, if exists - otherwise use URL
+        if (Files.exists(filePath))
+            episode = new Media(filePath.toUri().toString());
+        else
+            episode = new Media(link);
+    }
+
     public Duration getDuration() { return duration; }
     //    public Duration getDuration() { return episode.getDuration(); }
     public String getFileName() { return fileName; }
@@ -187,30 +231,13 @@ public class PodcastEpisode extends BorderPane {
     public String getPubDate() { return pubDate; }
     public String getLink() { return link; }
 
+    /*
     public String getFormattedPubDate() {
         LocalDateTime tmp = LocalDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(pubDate));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         return tmp.format(formatter);
-    }
+    }*/
 
-    /*
-        public String getFormattedDuration() {
-            long dur = (long) episode.getDuration().toSeconds();
-            long hours = dur / 3600;
-            long minutes = (dur % 3600) / 60;
-            long seconds = dur % 60;
-
-            String tmp = "";
-            if(hours > 0)
-                tmp = String.format("%01d:%02d:%02d", hours, minutes, seconds);
-            else if(minutes > 0)
-                tmp = String.format("%02d:%02d", minutes, seconds);
-            else if(seconds > 0)
-                tmp = String.format("%02d", seconds);
-
-            return tmp;
-        }
-    */
     @Override
     public String toString() {
         return title;
