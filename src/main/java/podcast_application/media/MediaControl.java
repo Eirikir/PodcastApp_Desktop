@@ -35,48 +35,9 @@ public class MediaControl extends BorderPane {
 
 
 
-    public MediaControl() {
+    public MediaControl(ListView<PodcastChannel> podcastChannelListView) {
 
-        loadChannels();
-
-        loadEpisodes();
-
-
-        currentEpisode = currentChannel.getEpisode(0);
-        currentEpisode.toggleChosen(true);
-        loadMediaPlayer();
-
-
-/*
-        mediaView = new MediaView(mediaPlayer);
-        Pane mvPane = new Pane() {                };
-        mvPane.getChildren().add(mediaView);
-        mvPane.setStyle("-fx-background-color: black;");
-        setCenter(mvPane);
-*/
-    }
-
-    private void loadChannels() {
-        List<PodcastChannel> loadedChannels = new ArrayList<>();
-//        List<Channel> channels = new ChannelsParser().readChannels();
-
-        RSSParser parser = new RSSParser(); // new
-
-        List<Channel> channels = parser.getChannels();
-        for(Channel c : channels) {
-            String imgPath = ChannelImage.getInstance().getChannelImage(c.getTitle(), c.getImage());
-            loadedChannels.add(new PodcastChannel(c, imgPath));
-//            loadedChannels.add(new PodcastChannel(c, imgPath));
-        }
-
-        ListView<PodcastChannel> podcastChannelListView = new ListView<>();
-        podcastChannelListView.getStyleClass().add("channelList");
-
-        podcastChannelListView.setItems(FXCollections.observableArrayList(loadedChannels));
-
-        podcastChannelListView.setPrefWidth(80);
-        podcastChannelListView.setBorder(Border.EMPTY);
-
+        ////////////////
         setLeft(podcastChannelListView);
 
         podcastChannelListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -94,9 +55,26 @@ public class MediaControl extends BorderPane {
             }
         });
 
-        currentChannel = loadedChannels.get(0);
         podcastChannelListView.getSelectionModel().select(0);
+        currentChannel = podcastChannelListView.getSelectionModel().getSelectedItem();
+        ////////////////
 
+
+        loadEpisodes();
+
+
+        currentEpisode = currentChannel.getEpisode(0);
+        currentEpisode.toggleChosen(true);
+        loadMediaPlayer();
+
+
+/*
+        mediaView = new MediaView(mediaPlayer);
+        Pane mvPane = new Pane() {                };
+        mvPane.getChildren().add(mediaView);
+        mvPane.setStyle("-fx-background-color: black;");
+        setCenter(mvPane);
+*/
     }
 
     private void loadEpisodes() {

@@ -16,6 +16,10 @@
     -fx-font-size: 10px;
 }
 
+#descLabel {
+    -fx-font-size: 12px;
+}
+
 .channelList, .episodeList {
     -fx-padding: 0px;
     -fx-border-width: 0px;
@@ -90,7 +94,7 @@
     -fx-background-color: transparent;
     -fx-background-size: 20px;
     -fx-background-repeat: no-repeat;
-    -fx-background-position: 90%;
+//    -fx-background-position: 90%;
     -fx-pref-width: 20px;
     -fx-pref-height: 20px;
 }
@@ -110,6 +114,18 @@
 */
 #deleteBtn {
     -fx-background-image: url('../images/error.png');
+}
+
+.smallBtnClass {
+    -fx-background-color: transparent;
+    -fx-background-size: 15px;
+    -fx-background-repeat: no-repeat;
+    -fx-pref-width: 15px;
+    -fx-pref-height: 15px;
+}
+
+#infoBtn {
+    -fx-background-image: url('../images/eye.png');
 }
 
 .downloadIndicator .percentage {

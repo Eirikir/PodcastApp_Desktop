@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
@@ -72,10 +73,18 @@ public class PodcastEpisode extends BorderPane {
 
     private void setUpUI() {
         VBox leftBox = new VBox();
+
+        HBox headBox = new HBox(10);
         Label titleLabel = new Label(title);
         titleLabel.setId("episodeTitleLabel");
         titleLabel.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(titleLabel, Priority.ALWAYS);
+//        HBox.setHgrow(titleLabel, Priority.ALWAYS);
+
+        Button infoBtn = new Button();
+        infoBtn.getStyleClass().add("smallBtnClass");
+        infoBtn.setId("infoBtn");
+
+        headBox.getChildren().addAll(titleLabel, infoBtn);
 
         HBox subBox = new HBox(10);
 //        Label dateLabel = new Label(Formatter.FORMAT_DATE(pubDate));
@@ -88,10 +97,15 @@ public class PodcastEpisode extends BorderPane {
         dateLabel.setId("episodeDateLabel");
         durationLabel.setId("episodeDurationLabel");
 
+
         subBox.getChildren().addAll(dateLabel, durationLabel);
 
+/*        Label descLabel = new Label(description);
+        descLabel.getStyleClass().add("mediaLabel");
+        descLabel.setId("descLabel");
+*/
 
-        leftBox.getChildren().addAll(titleLabel, subBox);
+        leftBox.getChildren().addAll(headBox, subBox);
 
         StackPane rightBox = new StackPane();
         rightBox.setAlignment(Pos.CENTER_RIGHT);

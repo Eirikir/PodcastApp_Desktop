@@ -1,56 +1,185 @@
 package podcast_application;
 
+import com.sun.javafx.application.LauncherImpl;
+import javafx.animation.FadeTransition;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Screen;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import podcast_application.media.MediaControl;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import podcast_application.media.gui.PodcastChannel;
+import podcast_application.singletons.ChannelImage;
 import podcast_application.singletons.DownloadManager;
+import podcast_application.xml.model.Channel;
 import podcast_application.xml.read.RSSParser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main extends Application {
-    //    private static final String MEDIA_URL =
-//            "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
+/*    public static final String SPLASH_IMAGE =
+            "http://fxexperience.com/wp-content/uploads/2010/06/logo.png"; */
+    public static final String SPLASH_IMAGE = "/images/preloader_logo.png";
+    private Pane splashLayout;
+    private ProgressBar loadProgress;
+    private Label progressText;
+    private Stage mainStage;
+    private static final int SPLASH_WIDTH = 676;
+    private static final int SPLASH_HEIGHT = 227;
+
+    // old
     MediaControl mediaControl;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        primaryStage.setTitle("Podcast Player");
-        primaryStage.getIcons().add(new Image("/images/microphone-1.png"));
+    public void init() {
+        ImageView splash = new ImageView(new Image(
+                SPLASH_IMAGE
+        ));
+        loadProgress = new ProgressBar();
+        loadProgress.setPrefWidth(SPLASH_WIDTH - 20);
+        progressText = new Label("Will find friends for peanuts . . .");
+        splashLayout = new VBox();
+        splashLayout.getChildren().addAll(splash, loadProgress, progressText);
+        progressText.setAlignment(Pos.CENTER);
+        splashLayout.setStyle(
+                "-fx-padding: 5; " +
+                        "-fx-background-color: cornsilk; " +
+                        "-fx-border-width:5; " +
+                        "-fx-border-color: " +
+                        "linear-gradient(" +
+                        "to bottom, " +
+                        "chocolate, " +
+                        "derive(chocolate, 50%)" +
+                        ");"
+        );
+        splashLayout.setEffect(new DropShadow());
+    }
+
+    @Override
+    public void start(final Stage initStage) throws Exception {
+
+        final Task<ListView<PodcastChannel>> loadChannels = new Task<ListView<PodcastChannel>>() {
+            @Override
+            protected ListView<PodcastChannel> call() throws InterruptedException {
+                List<PodcastChannel> loadedChannels = new ArrayList<>();
+
+                updateMessage("Loading Podcast channels...");
+                RSSParser parser = new RSSParser(); // new
+
+                List<Channel> channels = parser.getChannels();
+                for(Channel c : channels) {
+                    String imgPath = ChannelImage.getInstance().getChannelImage(c.getTitle(), c.getImage());
+                    loadedChannels.add(new PodcastChannel(c, imgPath));
+                }
+
+
+                ListView<PodcastChannel> podcastChannelListView = new ListView<>();
+                podcastChannelListView.getStyleClass().add("channelList");
+
+                podcastChannelListView.setItems(FXCollections.observableArrayList(loadedChannels));
+
+                podcastChannelListView.setPrefWidth(80);
+                podcastChannelListView.setBorder(Border.EMPTY);
+
+                return podcastChannelListView;
+            }
+        };
+
+        showSplash(
+                initStage,
+                loadChannels,
+                () -> showMainStage(loadChannels.getValue())
+        );
+
+        new Thread(loadChannels).start();
+    }
+
+    private void showMainStage(ListView<PodcastChannel> podcastChannelListView) {
+        mainStage = new Stage(StageStyle.DECORATED);
+        mainStage.setTitle("Podcast Player");
+        mainStage.getIcons().add(new Image("/images/microphone-1.png"));
         Group root = new Group();
         Scene scene = new Scene(root, 640, 341);
         scene.getStylesheets().add("/css/styles.css");
 
 
-        mediaControl = new MediaControl();
+        mediaControl = new MediaControl(podcastChannelListView);
         scene.setRoot(mediaControl);
 
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        mainStage.setScene(scene);
+        mainStage.show();
 
-        primaryStage.setOnCloseRequest(e -> {
+        mainStage.setOnCloseRequest(e -> {
             if(mediaControl.getHasBeenStarted())
                 mediaControl.save();
         });
+    }
 
-//        new TestRAF();
-//        new DropboxSync();
+    private void showSplash(
+            final Stage initStage,
+            Task<?> task,
+            InitCompletionHandler initCompletionHandler
+    ) {
+        progressText.textProperty().bind(task.messageProperty());
+        loadProgress.progressProperty().bind(task.progressProperty());
+        task.stateProperty().addListener((observableValue, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                loadProgress.progressProperty().unbind();
+                loadProgress.setProgress(1);
+                initStage.toFront();
+                FadeTransition fadeSplash = new FadeTransition(Duration.seconds(1.2), splashLayout);
+                fadeSplash.setFromValue(1.0);
+                fadeSplash.setToValue(0.0);
+                fadeSplash.setOnFinished(actionEvent -> initStage.hide());
+                fadeSplash.play();
 
-//        new RSSParser().parseFEED("ksks");
+                initCompletionHandler.complete();
+            } // todo add code to gracefully handle other task states.
+        });
+
+        Scene splashScene = new Scene(splashLayout, Color.TRANSPARENT);
+        final Rectangle2D bounds = Screen.getPrimary().getBounds();
+        initStage.setScene(splashScene);
+        initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
+        initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
+        initStage.initStyle(StageStyle.TRANSPARENT);
+        initStage.setAlwaysOnTop(true);
+        initStage.show();
+    }
+
+    public interface InitCompletionHandler {
+        void complete();
     }
 
     @Override
     public void stop() {
-        //       System.out.println("Exiting");
-//        if(mediaControl.getHasBeenStarted())
-//            mediaControl.save();
         mediaControl.stopMediaPlayer();
         DownloadManager.getInstance().shutDownManager(); // stops executorservice
     }
 
 
     public static void main(String[] args) {
+//        LauncherImpl.launchApplication(Main.class, System.property.javafx.preloder, args);
         launch(args);
     }
 }
