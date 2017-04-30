@@ -1,10 +1,11 @@
 package podcast_application.media;
 
+import javafx.scene.control.Alert;
 import podcast_application.media.gui.MediaBar;
 import podcast_application.media.gui.PodcastChannel;
 import podcast_application.media.gui.PodcastEpisode;
+import podcast_application.singletons.ChannelImage;
 import podcast_application.xml.model.Channel;
-import podcast_application.xml.read.ChannelsParser;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -17,6 +18,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+import podcast_application.xml.read.RSSParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +33,41 @@ public class MediaControl extends BorderPane {
     private PodcastChannel currentChannel;
     private boolean hasStarted = false;
 
+
+
+    public MediaControl() {
+
+        loadChannels();
+
+        loadEpisodes();
+
+
+        currentEpisode = currentChannel.getEpisode(0);
+        currentEpisode.toggleChosen(true);
+        loadMediaPlayer();
+
+
+/*
+        mediaView = new MediaView(mediaPlayer);
+        Pane mvPane = new Pane() {                };
+        mvPane.getChildren().add(mediaView);
+        mvPane.setStyle("-fx-background-color: black;");
+        setCenter(mvPane);
+*/
+    }
+
     private void loadChannels() {
         List<PodcastChannel> loadedChannels = new ArrayList<>();
-        List<Channel> channels = new ChannelsParser().readChannels();
-        for(Channel c : channels)
-            loadedChannels.add(new PodcastChannel(c));
+//        List<Channel> channels = new ChannelsParser().readChannels();
+
+        RSSParser parser = new RSSParser(); // new
+
+        List<Channel> channels = parser.getChannels();
+        for(Channel c : channels) {
+            String imgPath = ChannelImage.getInstance().getChannelImage(c.getTitle(), c.getImage());
+            loadedChannels.add(new PodcastChannel(c, imgPath));
+//            loadedChannels.add(new PodcastChannel(c, imgPath));
+        }
 
         ListView<PodcastChannel> podcastChannelListView = new ListView<>();
         podcastChannelListView.getStyleClass().add("channelList");
@@ -64,27 +96,7 @@ public class MediaControl extends BorderPane {
 
         currentChannel = loadedChannels.get(0);
         podcastChannelListView.getSelectionModel().select(0);
-    }
 
-    public MediaControl() {
-
-        loadChannels();
-
-        loadEpisodes();
-
-
-        currentEpisode = currentChannel.getEpisode(0);
-        currentEpisode.toggleChosen(true);
-        loadMediaPlayer();
-
-
-/*
-        mediaView = new MediaView(mediaPlayer);
-        Pane mvPane = new Pane() {                };
-        mvPane.getChildren().add(mediaView);
-        mvPane.setStyle("-fx-background-color: black;");
-        setCenter(mvPane);
-*/
     }
 
     private void loadEpisodes() {
@@ -99,6 +111,21 @@ public class MediaControl extends BorderPane {
             @Override
             public void handle(MouseEvent event) {
                 if(event.getClickCount() == 2) {
+
+                    PodcastEpisode tmp = episodeListView.getSelectionModel().getSelectedItem();
+
+                    // determine whether the new media can be streamed
+                    if(!tmp.canMediaBeStreamed() && !tmp.isLocalFilePresent()) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setHeaderText(null);
+                        alert.setTitle("Secure connection!");
+                        alert.setContentText("The media you have chosen is using a secure protocol and may not be streamed." +
+                                " In order to listen to this episode you have to download it first!");
+                        alert.show();
+                        return;
+                    }
+
+
                     if(hasStarted)
                         currentEpisode.setProgress(mediaPlayer.getCurrentTime());
                     else
@@ -106,7 +133,8 @@ public class MediaControl extends BorderPane {
 
                     // Use listview's getSelected item
                     currentEpisode.toggleChosen(false); // release lock on media file
-                    currentEpisode = episodeListView.getSelectionModel().getSelectedItem();
+           //         currentEpisode = episodeListView.getSelectionModel().getSelectedItem();
+                    currentEpisode = tmp;
                     currentEpisode.toggleChosen(true);
                     System.out.println("Chosen: "+currentEpisode);
 

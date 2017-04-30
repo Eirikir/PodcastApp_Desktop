@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import podcast_application.singletons.DownloadManager;
+import podcast_application.xml.read.RSSParser;
 
 public class Main extends Application {
     //    private static final String MEDIA_URL =
@@ -35,6 +36,8 @@ public class Main extends Application {
 
 //        new TestRAF();
 //        new DropboxSync();
+
+//        new RSSParser().parseFEED("ksks");
     }
 
     @Override

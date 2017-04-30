@@ -40,7 +40,7 @@ public class DropboxSync {
             ListFolderResult files = getFiles();
             for (Metadata meta : files.getEntries()) {
                 System.out.println("name: "+meta.getName());
-                if(meta.getName().equals("channels.xml")) {
+                if(meta.getName().equals("subscriptions.xml")) {
 //                    System.out.println("Exists"+meta.toStringMultiline());
 //                    FileMetadata t = (FileMetadata) meta;
 //                    t.getClientModified();
@@ -53,7 +53,7 @@ public class DropboxSync {
 
 
 
-            uploadFile(new File("./Podcasts/channels.xml"), "/channels.xml");
+            uploadFile(new File("./Podcasts/subscriptions.xml"), "/subscriptions.xml");
             uploadFile(new File("./Podcasts/StarTalk Radio/episodes.xml"), "/StarTalk Radio/episodes.xml");
 
         } catch (Exception ex) {
@@ -108,8 +108,8 @@ public class DropboxSync {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-/*        try (InputStream in = new FileInputStream("./Podcasts/channels.xml")) {
-            FileMetadata metadata = client.files().uploadBuilder("/channels.xml").uploadAndFinish(in);
+/*        try (InputStream in = new FileInputStream("./Podcasts/subscriptions.xml")) {
+            FileMetadata metadata = client.files().uploadBuilder("/subscriptions.xml").uploadAndFinish(in);
         } catch (Exception ex) {
             ex.printStackTrace();
         } */

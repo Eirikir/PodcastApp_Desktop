@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <channels>
+    <channel>
+        <title>StarTalk Radio</title>
+        <source_rss>http://feeds.soundcloud.com/users/soundcloud:users:38128127/sounds.rss</source_rss>
+    </channel>
+    <channel>
+        <title>The Nerdist</title>
+        <source_rss>http://nerdist.libsyn.com/rss</source_rss>
+    </channel>
+    <channel>
+        <title>The Bugle</title>
+        <source_rss>http://feeds.thebuglepodcast.com/thebuglefeed</source_rss>
+        <!--
+        <source_rss>http://feeds.feedburner.com/thebuglefeed?format=xml</source_rss>
+        -->
+    </channel>
+</channels>
+<!--
+<channels>
     <item>
         <title>StarTalk Radio</title>
         <link>http://startalkradio.net</link>
@@ -17,3 +35,4 @@
         <image>http://static.libsyn.com/p/assets/3/c/4/5/3c45b257669e76d7/nerdistlogo.jpg</image>
     </item>
 </channels>
+-->

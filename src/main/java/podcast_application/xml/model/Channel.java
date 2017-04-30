@@ -1,6 +1,13 @@
 package podcast_application.xml.model;
 
+import javafx.scene.image.Image;
+
+import java.util.List;
+
 public class Channel {
+    private String title, link, description, language, date, image;
+    private List<Item> items;
+
     public String getTitle() {
         return title;
     }
@@ -49,5 +56,7 @@ public class Channel {
         this.image = image;
     }
 
-    private String title, link, description, language, date, image;
+    public void setItems(List<Item> items) { this.items = items; }
+    public List<Item> getItems() { return items; }
+
 }

@@ -2,16 +2,27 @@ package podcast_application.singletons;
 
 import javafx.util.Duration;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class Formatter {
     private static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    private static SimpleDateFormat DATE_FORMATTER_ROME = new SimpleDateFormat("yyyy/MM/dd");
+//    private static SimpleDateFormat DATE_FORMATTER_ROME = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
 
     public static String FORMAT_DATE(String date) {
         LocalDateTime tmp = LocalDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(date));
+//        LocalDateTime tmp = LocalDateTime.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(date));
         return tmp.format(DATE_FORMATTER);
     }
+
+    // used in parsing RSS ROME files
+    public static String FORMAT_DATE_ROME(Date date) {
+        return DATE_FORMATTER_ROME.format(date);
+    }
+
     /**
      * used mainly for formatting strings in xml
      * @param duration

@@ -1,7 +1,10 @@
 package podcast_application.xml.model;
 
+import java.util.Date;
+
 public class Item {
-    private String title, description, date, link, duration, progress;
+    private String title, description, link, duration, progress;
+    private Date date;
 
     public String getTitle() {
         return title;
@@ -19,11 +22,11 @@ public class Item {
         this.description = description;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

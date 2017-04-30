@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -43,10 +44,12 @@ public class PodcastEpisode extends BorderPane {
 
         title = item.getTitle();
         description = item.getDescription();
-        pubDate = item.getDate();
+//        pubDate = item.getDate();
+        pubDate = Formatter.FORMAT_DATE_ROME(item.getDate());
         link = item.getLink();
+//        link = formatLink(item.getLink());
         fileName = parseFileName();
-        filePath = Paths.get(basePath+"/"+fileName);
+        filePath = Paths.get(basePath + "/" + fileName);
 
         // set local file location
 //        localFile = new File(filePath.toString());
@@ -59,6 +62,14 @@ public class PodcastEpisode extends BorderPane {
         setUpUI();
     }
 
+    public boolean canMediaBeStreamed() {
+        return (!link.startsWith("https"));
+    }
+
+    public boolean isLocalFilePresent() {
+        return (Files.exists(filePath));
+    }
+
     private void setUpUI() {
         VBox leftBox = new VBox();
         Label titleLabel = new Label(title);
@@ -67,7 +78,8 @@ public class PodcastEpisode extends BorderPane {
         HBox.setHgrow(titleLabel, Priority.ALWAYS);
 
         HBox subBox = new HBox(10);
-        Label dateLabel = new Label(Formatter.FORMAT_DATE(pubDate));
+//        Label dateLabel = new Label(Formatter.FORMAT_DATE(pubDate));
+        Label dateLabel = new Label(pubDate);
         dateLabel.getStyleClass().add("mediaLabel");
         HBox.setHgrow(dateLabel, Priority.ALWAYS);
         Label durationLabel = new Label(Formatter.FORMAT_TIME(duration));
@@ -203,8 +215,20 @@ public class PodcastEpisode extends BorderPane {
     }
 
     private String parseFileName() {
-        int idx = link.lastIndexOf("/");
-        return link.substring(idx + 1);
+//        int idx = link.lastIndexOf("/");
+//        return link.substring(idx + 1);
+        int startIdx = 0, endIdx = 0;
+        String tmp = "";
+        try {
+            startIdx = link.lastIndexOf("/");
+            endIdx = link.lastIndexOf(".m");
+            tmp = link.substring(startIdx, endIdx + 4);
+        } catch (StringIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+            System.out.println("Link: "+link);
+        }
+//        return link.substring(startIdx, endIdx + 4);
+        return tmp;
     }
 
     public Media getAsMedia() {
