@@ -5,44 +5,36 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
 import podcast_application.singletons.DownloadManager;
 import podcast_application.singletons.Formatter;
 import podcast_application.xml.model.Item;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class PodcastEpisode extends BorderPane {
     private Media episode = null;
     private String fileName;
     private Path filePath;
-    private String title, description, pubDate, link;
+    private String title, description, pubDate, link, guid, channelName;
     private Duration progress, duration;
     private boolean downloading = false;
     private Button fileBtn;
+
     // id's for file button
     private final String ID_DOWNLOAD = "downloadBtn", ID_DELETE = "deleteBtn", ID_PLAYING = "playingBtn";
 //    private File localFile;
     private ProgressIndicator progressIndicator;
 
-    public PodcastEpisode(Item item, String basePath) {
+    public PodcastEpisode(Item item, String basePath, String channelName) {
         super();
 
+        guid = item.getGuid();
         title = item.getTitle();
         description = item.getDescription();
 //        pubDate = item.getDate();
@@ -51,6 +43,7 @@ public class PodcastEpisode extends BorderPane {
 //        link = formatLink(item.getLink());
         fileName = parseFileName();
         filePath = Paths.get(basePath + "/" + fileName);
+        this.channelName = channelName;
 
         // set local file location
 //        localFile = new File(filePath.toString());
@@ -62,6 +55,8 @@ public class PodcastEpisode extends BorderPane {
         // GUI
         setUpUI();
     }
+
+    public String getChannelName() { return channelName; }
 
     public boolean canMediaBeStreamed() {
         return (!link.startsWith("https"));
@@ -102,7 +97,7 @@ public class PodcastEpisode extends BorderPane {
 
 /*        Label descLabel = new Label(description);
         descLabel.getStyleClass().add("mediaLabel");
-        descLabel.setId("descLabel");
+        descLabel.setGuid("descLabel");
 */
 
         leftBox.getChildren().addAll(headBox, subBox);
@@ -131,7 +126,7 @@ public class PodcastEpisode extends BorderPane {
 
 /*        if(localFile.exists()) {
             episode = new Media(localFile.toURI().toString());
-            fileBtn.setId("deleteBtn");
+            fileBtn.setGuid("deleteBtn");
         } */
         if(Files.exists(filePath)) {
 //            episode = new Media(filePath.toUri().toString());
@@ -165,7 +160,7 @@ public class PodcastEpisode extends BorderPane {
                 if(localFile.exists()) { // delete file
                     if(localFile.delete()) {
                         System.out.println("File deleted");
-                        fileBtn.setId("downloadBtn");
+                        fileBtn.setGuid("downloadBtn");
 
                         // nullify media source
                         episode = null;
@@ -262,19 +257,20 @@ public class PodcastEpisode extends BorderPane {
     //    public Duration getDuration() { return episode.getDuration(); }
     public String getFileName() { return fileName; }
     public void setProgress(Duration progress) { this.progress = progress; }
+    public boolean updateProgress(Duration progress) {
+        if(progress.equals(this.progress))
+            return false;
+        setProgress(progress);
+        return true;
+    }
     public Duration getProgress() { return progress; }
 
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public String getPubDate() { return pubDate; }
     public String getLink() { return link; }
+    public String getGuid() { return guid; }
 
-    /*
-    public String getFormattedPubDate() {
-        LocalDateTime tmp = LocalDateTime.from(DateTimeFormatter.RFC_1123_DATE_TIME.parse(pubDate));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        return tmp.format(formatter);
-    }*/
 
     @Override
     public String toString() {

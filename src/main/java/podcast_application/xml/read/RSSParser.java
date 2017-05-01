@@ -12,6 +12,8 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import podcast_application.database.ChannelDB;
+import podcast_application.database.DatabaseManager;
 import podcast_application.xml.model.Channel;
 import podcast_application.xml.model.Item;
 
@@ -27,7 +29,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class RSSParser {
@@ -191,12 +192,22 @@ public class RSSParser {
             channel.setLanguage(feed.getLanguage());
             channel.setLink(feed.getLink());
 
+            ChannelDB db = DatabaseManager.getInstance().getDatabase("./Podcasts/"+feed.getTitle());
+            int dbSize = db.getAmountOfStoredItems();
 
             List<Item> items = new ArrayList<>();
-            for (Object entry : feed.getEntries())
-                items.add(parseItem((SyndEntry)entry));
+            for (Object entry : feed.getEntries()) {
+//                items.add(parseItem((SyndEntry) entry));
+                Item tmp = parseItem((SyndEntry) entry);
+                String val = db.getProgressOfID(tmp.getGuid());
+                if(val != null)
+                    tmp.setProgress(val);
+
+                items.add(tmp);
+            }
 
             channel.setItems(items);
+            channel.setDatabase(db);
             channels.add(channel);
 
 
@@ -205,9 +216,11 @@ public class RSSParser {
         }
     }
 
+
     private Item parseItem(SyndEntry entry) {
         Item tmp = new Item();
 
+        tmp.setGuid(entry.getUri());
         tmp.setTitle(entry.getTitle());
         tmp.setDescription(entry.getDescription().getValue());
 

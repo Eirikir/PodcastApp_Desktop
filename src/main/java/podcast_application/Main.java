@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import podcast_application.database.ChannelDB;
 import podcast_application.media.MediaControl;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -33,8 +34,14 @@ import podcast_application.singletons.DownloadManager;
 import podcast_application.xml.model.Channel;
 import podcast_application.xml.read.RSSParser;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main extends Application {
 /*    public static final String SPLASH_IMAGE =
@@ -133,6 +140,28 @@ public class Main extends Application {
             if(mediaControl.getHasBeenStarted())
                 mediaControl.save();
         });
+
+        // test database
+/*        ChannelDB db = new ChannelDB();
+        db.addEpisode("Jane", "Rick");
+        db.addEpisode("Mike", "Bob");
+        try {
+            // save Object
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("./Podcasts/db.dat"))) {
+                oos.writeObject(db);
+            }
+
+            db = null;
+
+            // read object
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./Podcasts/db.dat"))) {
+                db = (ChannelDB) ois.readObject();
+                Map<String, String> map = db.getEpisodesProgress();
+                System.out.println(map.get("Mike"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
     }
 
     private void showSplash(

@@ -1,12 +1,24 @@
 package podcast_application.xml.model;
 
 import javafx.scene.image.Image;
+import podcast_application.database.ChannelDB;
 
 import java.util.List;
 
 public class Channel {
     private String title, link, description, language, date, image;
     private List<Item> items;
+    private ChannelDB database;
+
+    public ChannelDB getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(ChannelDB database) {
+        this.database = database;
+    }
+
+
 
     public String getTitle() {
         return title;

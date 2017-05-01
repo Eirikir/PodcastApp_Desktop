@@ -1,6 +1,7 @@
 package podcast_application.media;
 
 import javafx.scene.control.Alert;
+import javafx.scene.input.MouseButton;
 import podcast_application.media.gui.MediaBar;
 import podcast_application.media.gui.PodcastChannel;
 import podcast_application.media.gui.PodcastEpisode;
@@ -20,8 +21,7 @@ import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 import podcast_application.xml.read.RSSParser;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MediaControl extends BorderPane {
     private MediaPlayer mediaPlayer;
@@ -30,14 +30,16 @@ public class MediaControl extends BorderPane {
     private final boolean repeat = false;
     private boolean stopRequested = false;
     private boolean atEndOfMedia = false;
+    private Map<String, PodcastChannel> channelsMap = new HashMap<>();
     private PodcastChannel currentChannel;
     private boolean hasStarted = false;
 
 
 
     public MediaControl(ListView<PodcastChannel> podcastChannelListView) {
+        for(PodcastChannel pod : podcastChannelListView.getItems())
+            channelsMap.put(pod.getChannelTitle(), pod);
 
-        ////////////////
         setLeft(podcastChannelListView);
 
         podcastChannelListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -47,7 +49,6 @@ public class MediaControl extends BorderPane {
 
                     // Use listview's getSelected item
                     currentChannel = podcastChannelListView.getSelectionModel().getSelectedItem();
-//                    System.out.println("Chosen: "+currentChannel);
 
                     loadEpisodes();
 
@@ -57,11 +58,8 @@ public class MediaControl extends BorderPane {
 
         podcastChannelListView.getSelectionModel().select(0);
         currentChannel = podcastChannelListView.getSelectionModel().getSelectedItem();
-        ////////////////
-
 
         loadEpisodes();
-
 
         currentEpisode = currentChannel.getEpisode(0);
         currentEpisode.toggleChosen(true);
@@ -88,6 +86,9 @@ public class MediaControl extends BorderPane {
         episodeListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                if(event.getButton() == MouseButton.SECONDARY) { // right click (NOT IN USE)
+                    System.out.println("Clicked");
+                }
                 if(event.getClickCount() == 2) {
 
                     PodcastEpisode tmp = episodeListView.getSelectionModel().getSelectedItem();
@@ -103,18 +104,12 @@ public class MediaControl extends BorderPane {
                         return;
                     }
 
-
-                    if(hasStarted)
-                        currentEpisode.setProgress(mediaPlayer.getCurrentTime());
-                    else
-                        hasStarted = true;
+                    storeProgressOfCurrentEpisode();
 
                     // Use listview's getSelected item
                     currentEpisode.toggleChosen(false); // release lock on media file
-           //         currentEpisode = episodeListView.getSelectionModel().getSelectedItem();
                     currentEpisode = tmp;
                     currentEpisode.toggleChosen(true);
-                    System.out.println("Chosen: "+currentEpisode);
 
                     mediaPlayer.stop();
                     mediaPlayer.dispose();
@@ -151,6 +146,9 @@ public class MediaControl extends BorderPane {
                     stopRequested = false;
                 } else {
                     mediaBar.togglePlay(false);
+
+                    if(!hasStarted)
+                        hasStarted = true; // we have now started the player for the first time
                 }
             }
         });
@@ -160,8 +158,7 @@ public class MediaControl extends BorderPane {
             public void run() {
                 System.out.println("onPaused");
                 mediaBar.togglePlay(true);
-                currentEpisode.setProgress(mediaPlayer.getCurrentTime());
-//                save();
+                storeProgressOfCurrentEpisode();
             }
         });
 
@@ -173,6 +170,7 @@ public class MediaControl extends BorderPane {
                 mediaPlayer.seek(Duration.seconds(currentEpisode.getProgress().toSeconds()));
                 mediaBar.setDuration(currentEpisode.getAsMedia().getDuration());
                 mediaBar.updateValues();
+//                hasStarted = false;
             }
         });
 
@@ -194,13 +192,25 @@ public class MediaControl extends BorderPane {
         setBottom(mediaBar);
     }
 
+    private void storeProgressOfCurrentEpisode() {
+        // store progress of current episode if needed
+        if(currentEpisode.updateProgress(mediaPlayer.getCurrentTime()))
+            channelsMap.get(currentEpisode.getChannelName()).storeEpisodeProgress(currentEpisode);
+    }
+
     public void save() {
-        currentChannel.saveEpisodes();
+        storeProgressOfCurrentEpisode();
+
+        // save progress of all modified episodes, in each channel
+        for (Map.Entry<String, PodcastChannel> entry : channelsMap.entrySet())
+            entry.getValue().saveEpisodes();
+
         System.out.println("Save done!");
 
     }
 
     public void stopMediaPlayer() {
+
         mediaPlayer.stop();
         mediaPlayer.dispose();
     }

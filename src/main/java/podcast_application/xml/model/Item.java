@@ -3,7 +3,7 @@ package podcast_application.xml.model;
 import java.util.Date;
 
 public class Item {
-    private String title, description, link, duration, progress;
+    private String title, description, link, duration, progress, guid;
     private Date date;
 
     public String getTitle() {
@@ -53,6 +53,9 @@ public class Item {
     public void setProgress(String progress) {
         this.progress = progress;
     }
+
+    public String getGuid() { return guid; }
+    public void setGuid(String guid) { this.guid = guid; }
 
     @Override
     public String toString() {
