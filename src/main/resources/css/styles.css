@@ -72,16 +72,16 @@
 }
 
 #playBtn {
-    -fx-background-image: url('../images/play.png');
+    -fx-background-image: url('../images/play-32.png');
 
 }
 
 #pauseBtn {
-    -fx-background-image: url('../images/pause.png');
+    -fx-background-image: url('../images/pause-32.png');
 }
 
 #volumeLabel {
-    -fx-background-image: url('../images/volume-3.png');
+    -fx-background-image: url('../images/Volume_2-32.png');
     -fx-background-color: transparent;
     -fx-background-size: 20px;
     -fx-background-repeat: no-repeat;
@@ -100,20 +100,20 @@
 }
 
 #downloadBtn {
-    -fx-background-image: url('../images/Button-Download-icon.png');
+    -fx-background-image: url('../images/cloud-download-32.png');
 }
 
 #playingBtn {
-    -fx-background-image: url('../images/volume-3.png');
+    -fx-background-image: url('../images/music-32.png');
 }
 
 /*
 #downloadingBtn {
-    -fx-background-image: url('../images/hourglass.png');
+    -fx-background-image: url('../images/hourglass-32.png');
 }
 */
 #deleteBtn {
-    -fx-background-image: url('../images/error.png');
+    -fx-background-image: url('../images/delete-32.png');
 }
 
 .smallBtnClass {
@@ -124,8 +124,33 @@
     -fx-pref-height: 15px;
 }
 
-#infoBtn {
-    -fx-background-image: url('../images/eye.png');
+.progressBtnClass {
+    -fx-background-color: transparent;
+    -fx-background-size: 10px;
+    -fx-background-repeat: no-repeat;
+    -fx-pref-width: 10px;
+    -fx-pref-height: 10px;
+}
+
+#progressUnplayed {
+    -fx-background-image: url('../images/circle_full-10.png');
+
+}
+
+#progressNotDone {
+    -fx-background-image: url('../images/circle_half-10.png');
+}
+
+#progressDone {
+    -fx-background-image: url('../images/check-32.png');
+}
+
+#infoBtnDown {
+     -fx-background-image: url('../images/arrow_down-32.png');
+}
+
+#infoBtnUp {
+    -fx-background-image: url('../images/arrow_up-32.png');
 }
 
 .downloadIndicator .percentage {

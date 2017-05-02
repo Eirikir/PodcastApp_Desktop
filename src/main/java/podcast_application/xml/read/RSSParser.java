@@ -34,6 +34,7 @@ import java.util.*;
 public class RSSParser {
     private final String BASE_PATH = "./Podcasts/",
             CHANNEL_FILE = "/channel.rss";
+    private final String LINE_SEPARATOR = "\n";
     private List<Channel> channels = new ArrayList<>();
 
     public RSSParser() {
@@ -222,7 +223,14 @@ public class RSSParser {
 
         tmp.setGuid(entry.getUri());
         tmp.setTitle(entry.getTitle());
-        tmp.setDescription(entry.getDescription().getValue());
+
+        // format description (some uses HTML tags)
+        String formattedDescription = entry.getDescription().getValue()
+                .replaceAll("\\<.*?\\>", "").trim()     // remove html tags
+                .split(LINE_SEPARATOR)[0]                                    // remove redundant information
+        ;
+        tmp.setDescription(formattedDescription);
+//        tmp.setDescription(entry.getDescription().getValue());
 
         tmp.setDate(entry.getPublishedDate());
         tmp.setLink(((SyndEnclosure) entry.getEnclosures().get(0)).getUrl());

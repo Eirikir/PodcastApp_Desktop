@@ -123,7 +123,7 @@ public class Main extends Application {
 
     private void showMainStage(ListView<PodcastChannel> podcastChannelListView) {
         mainStage = new Stage(StageStyle.DECORATED);
-        mainStage.setTitle("Podcast Player");
+        mainStage.setTitle("PodRunner");
         mainStage.getIcons().add(new Image("/images/microphone-1.png"));
         Group root = new Group();
         Scene scene = new Scene(root, 640, 341);
@@ -141,27 +141,6 @@ public class Main extends Application {
                 mediaControl.save();
         });
 
-        // test database
-/*        ChannelDB db = new ChannelDB();
-        db.addEpisode("Jane", "Rick");
-        db.addEpisode("Mike", "Bob");
-        try {
-            // save Object
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("./Podcasts/db.dat"))) {
-                oos.writeObject(db);
-            }
-
-            db = null;
-
-            // read object
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./Podcasts/db.dat"))) {
-                db = (ChannelDB) ois.readObject();
-                Map<String, String> map = db.getEpisodesProgress();
-                System.out.println(map.get("Mike"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
     }
 
     private void showSplash(

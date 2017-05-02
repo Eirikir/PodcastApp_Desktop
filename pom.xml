@@ -45,7 +45,7 @@
                 <!-- required before build-native -->
                 <executions>
                     <execution>
-                        <guid>create-jfxjar</guid>
+                        <id>create-jfxjar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>build-jar</goal>
