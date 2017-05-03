@@ -17,7 +17,8 @@
 }
 
 #descLabel {
-    -fx-font-size: 12px;
+    -fx-font-size: 10px;
+    -fx-text-fill: #989d9d;
 }
 
 .channelList, .episodeList {
@@ -59,6 +60,11 @@
 
 .episodeList:focused {
     -fx-background-color: transparent;
+}
+
+.list-view .scroll-bar:vertical {
+    -fx-scale-x: 0;
+    -fx-pref-width: 0;
 }
 
 .mediaBtnClass {
@@ -145,16 +151,60 @@
     -fx-background-image: url('../images/check-32.png');
 }
 
+.downloadIndicator .percentage {
+    -fx-font-size: 0.916667em; /* 11pt - 1 less than the default font */
+    -fx-text-background-color: white;
+    -fx-fill: -fx-text-background-color;
+}
+
+
+/* CHANNEL INFORMATION */
+.channelInfoPane {
+    -fx-control-inner-background: black;
+    -fx-background-color: black;
+//    -fx-padding: 0px;
+}
+
+
 #infoBtnDown {
-     -fx-background-image: url('../images/arrow_down-32.png');
+    -fx-background-image: url('../images/arrow_down-32.png');
 }
 
 #infoBtnUp {
     -fx-background-image: url('../images/arrow_up-32.png');
 }
 
-.downloadIndicator .percentage {
-    -fx-font-size: 0.916667em; /* 11pt - 1 less than the default font */
-    -fx-text-background-color: white;
-    -fx-fill: -fx-text-background-color;
+.channelInfoLabelClass {
+    -fx-text-fill: white;
+    -fx-font-smoothing-type: lcd;
+}
+
+#channelInfoTitle {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+#channelEpisodes {
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+#channelInfoDesc {
+    -fx-font-size: 12px;
+}
+
+/* NES */
+.channelInfoBtn {
+    -fx-background-color: transparent;
+    -fx-background-size: 20px;
+    -fx-background-repeat: no-repeat;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+}
+#addChannelBtn {
+    -fx-background-image: url('../images/add_icon-32.png');
+}
+
+#removeChannelBtn {
+    -fx-background-image: url('../images/delete-32.png');
 }

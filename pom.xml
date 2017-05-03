@@ -53,7 +53,7 @@
                     </execution>
                     <!--
                     <execution>
-                     guid <id>create-natiguid</id>
+                     <id>create-native</id>
                         <phase>package</phase>
                         <goals>
                             <goal>build-native</goal>

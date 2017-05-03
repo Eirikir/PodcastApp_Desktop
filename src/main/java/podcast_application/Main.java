@@ -30,6 +30,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import podcast_application.media.gui.PodcastChannel;
 import podcast_application.singletons.ChannelImage;
+import podcast_application.singletons.ChannelManager;
 import podcast_application.singletons.DownloadManager;
 import podcast_application.xml.model.Channel;
 import podcast_application.xml.read.RSSParser;
@@ -126,11 +127,14 @@ public class Main extends Application {
         mainStage.setTitle("PodRunner");
         mainStage.getIcons().add(new Image("/images/microphone-1.png"));
         Group root = new Group();
-        Scene scene = new Scene(root, 640, 341);
+//        Scene scene = new Scene(root, 640, 341);
+        Scene scene = new Scene(root, 680, 441);
         scene.getStylesheets().add("/css/styles.css");
 
 
-        mediaControl = new MediaControl(podcastChannelListView);
+        ChannelManager.getInstance().setChannelListView(podcastChannelListView);
+        mediaControl = new MediaControl();
+//        mediaControl = new MediaControl(podcastChannelListView);
         scene.setRoot(mediaControl);
 
         mainStage.setScene(scene);

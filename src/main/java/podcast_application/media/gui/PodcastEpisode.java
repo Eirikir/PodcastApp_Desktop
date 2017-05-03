@@ -29,6 +29,10 @@ public class PodcastEpisode extends BorderPane {
     private boolean downloading = false;
     private Button fileBtn;
 
+    // for details view
+    Label descLabel;
+    boolean showDetails = false;
+
     // id's for file button
     private final String ID_DOWNLOAD = "downloadBtn", ID_DELETE = "deleteBtn", ID_PLAYING = "playingBtn";
     private ProgressIndicator progressIndicator;
@@ -54,6 +58,11 @@ public class PodcastEpisode extends BorderPane {
         loadGUI();
     }
 
+    public void toggleDetails() {
+        showDetails = (showDetails) ? false : true;
+        descLabel.setWrapText(showDetails);
+    }
+
     private void loadGUI() {
 
         Button progressBtn = new Button();
@@ -69,11 +78,11 @@ public class PodcastEpisode extends BorderPane {
         titleLabel.setId("episodeTitleLabel");
         titleLabel.setMaxWidth(Double.MAX_VALUE);
 
-        Button infoBtn = new Button();
+/*        Button infoBtn = new Button();
         infoBtn.getStyleClass().add("smallBtnClass");
         infoBtn.setId("infoBtnDown");
-
-        HBox headBox = new HBox(10, titleLabel, infoBtn);
+*/
+        HBox headBox = new HBox(10, titleLabel);
 
         Label dateLabel = new Label(pubDate);
         dateLabel.getStyleClass().add("mediaLabel");
@@ -100,7 +109,7 @@ public class PodcastEpisode extends BorderPane {
 
         HBox textBox = new HBox();
 
-        Label descLabel = new Label(description);
+        descLabel = new Label(description);
         descLabel.getStyleClass().add("mediaLabel");
         descLabel.setId("descLabel");
         descLabel.setWrapText(false);
@@ -123,7 +132,7 @@ public class PodcastEpisode extends BorderPane {
 //        setMargin(descLabel, new Insets(5,0,0,0));
         setPadding(new Insets(5,0,0,0));
 
-
+/*
         infoBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -138,7 +147,7 @@ public class PodcastEpisode extends BorderPane {
                 descLabel.setWrapText(false);
             }
         });
-
+*/
     }
 
 
@@ -213,6 +222,9 @@ public class PodcastEpisode extends BorderPane {
         fileBtn.setVisible(false);
         progressIndicator.setVisible(true);
         progressIndicator.setProgress(0);
+
+//        System.out.println("link: "+link);
+//        System.out.println("filepath: "+filePath.toString());
 
         DownloadManager.getInstance().addTask(link, filePath.toString(), this);
     }

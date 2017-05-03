@@ -14,6 +14,7 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import podcast_application.database.ChannelDB;
 import podcast_application.database.DatabaseManager;
+import podcast_application.database.SubscriptionsDB;
 import podcast_application.xml.model.Channel;
 import podcast_application.xml.model.Item;
 
@@ -29,6 +30,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public class RSSParser {
@@ -41,8 +43,28 @@ public class RSSParser {
         if(Files.notExists(Paths.get(BASE_PATH))) // create 'Podcasts' dir if not present
             writeDefaultFiles();
 
-        // load base channel info
-        for (Subscription sub : getSubscriptions()) {
+        FeedParser feedParser = FeedParser.getInstance();
+
+        // Load base channel info from database
+        SubscriptionsDB db = DatabaseManager.getInstance().getSubscriptionsDB();
+        for (Map.Entry<String, String> entry : db.getSubscriptions().entrySet()) {
+            String title = entry.getKey();
+            String sourceRSS = entry.getValue();
+
+            if(Files.notExists(Paths.get(BASE_PATH + title))) // create channel dir if not present
+                new File(BASE_PATH + title).mkdir();
+
+            // check whether the channel feed needs to be updated (or created if not present)
+            File channelFile = new File(BASE_PATH + title + CHANNEL_FILE);
+            updateLocalFile(sourceRSS, channelFile);
+
+            // ... get channel & episode information
+            channels.add(feedParser.parseFEED(channelFile));
+        }
+
+        // load base channel info from xml
+/*        for (Subscription sub : getSubscriptions())
+        {
 
             if(Files.notExists(Paths.get(BASE_PATH + sub.getTitle()))) // create channel dir if not present
                 new File(BASE_PATH + sub.getTitle()).mkdir();
@@ -52,21 +74,24 @@ public class RSSParser {
             updateLocalFile(sub.getSourceRSS(), channelFile);
 
             // ... get channel & episode information
-            parseFEED(channelFile);
+            channels.add(feedParser.parseFEED(channelFile));
+//            parseFEED(channelFile);
         }
-
+*/
     }
 
     private void writeDefaultFiles() {
         new File(BASE_PATH).mkdir(); // create 'Podcasts' dir
 
-        final String SUB_FILE = "/subscriptions.xml";
+//        final String SUB_FILE = "/subscriptions.xml";
+        final String SUB_FILE = "/subscriptions.dat";
 
         // Now copy default files
         InputStream is = null;
         try {
             is = getClass().getResourceAsStream("/defaultFiles"+SUB_FILE);
-            Files.copy(is, Paths.get(BASE_PATH + SUB_FILE));
+            Files.copy(is, Paths.get(BASE_PATH + SUB_FILE),
+                    StandardCopyOption.REPLACE_EXISTING);
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -102,7 +127,7 @@ public class RSSParser {
 //                String modified = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date(tmp));
 //                System.out.println("File modified: " + modified);
 
-                fos.close();
+ //               fos.close();
                 rbc.close();
             }
             conn.disconnect();
@@ -113,7 +138,7 @@ public class RSSParser {
         }
 
     }
-
+/*
     private List<Subscription> getSubscriptions() {
         final String CHANNEL = "channel", TITLE = "title", SOURCE_RSS = "source_rss";
         List<Subscription> subscriptions = new ArrayList<>();
@@ -172,77 +197,19 @@ public class RSSParser {
             }
         }
 
+
+//        translateXMLtoDAT(subscriptions);
+
         return subscriptions;
     }
-
-    private void parseFEED(File channelFile) {
-        try {
-//            String url = "http://feeds.soundcloud.com/users/soundcloud:users:38128127/sounds.rss";
-            URL feedSource = channelFile.toURI().toURL();
-
-            SyndFeedInput input = new SyndFeedInput();
-            SyndFeed feed = input.build(new XmlReader(feedSource));
-            Module module = feed.getModule("http://www.itunes.com/dtds/podcast-1.0.dtd");
-            FeedInformation feedInfo = (FeedInformation) module;
-
-            Channel channel = new Channel();
-            channel.setTitle(feed.getTitle());
-            channel.setDescription(feed.getDescription());
-            channel.setDate(feed.getPublishedDate().toString());
-            channel.setImage(feedInfo.getImage().toString());
-            channel.setLanguage(feed.getLanguage());
-            channel.setLink(feed.getLink());
-
-            ChannelDB db = DatabaseManager.getInstance().getDatabase("./Podcasts/"+feed.getTitle());
-            int dbSize = db.getAmountOfStoredItems();
-
-            List<Item> items = new ArrayList<>();
-            for (Object entry : feed.getEntries()) {
-//                items.add(parseItem((SyndEntry) entry));
-                Item tmp = parseItem((SyndEntry) entry);
-                String val = db.getProgressOfID(tmp.getGuid());
-                if(val != null)
-                    tmp.setProgress(val);
-
-                items.add(tmp);
-            }
-
-            channel.setItems(items);
-            channel.setDatabase(db);
-            channels.add(channel);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+*/
+/*    private void translateXMLtoDAT(List<Subscription> subscriptions) {
+        SubscriptionsDB db = new SubscriptionsDB();
+        for (Subscription sub : subscriptions)
+            db.addSubscription(sub.getTitle(), sub.getSourceRSS());
+        DatabaseManager.getInstance().storeSubscriptions(db);
     }
-
-
-    private Item parseItem(SyndEntry entry) {
-        Item tmp = new Item();
-
-        tmp.setGuid(entry.getUri());
-        tmp.setTitle(entry.getTitle());
-
-        // format description (some uses HTML tags)
-        String formattedDescription = entry.getDescription().getValue()
-                .replaceAll("\\<.*?\\>", "").trim()     // remove html tags
-                .split(LINE_SEPARATOR)[0]                                    // remove redundant information
-        ;
-        tmp.setDescription(formattedDescription);
-//        tmp.setDescription(entry.getDescription().getValue());
-
-        tmp.setDate(entry.getPublishedDate());
-        tmp.setLink(((SyndEnclosure) entry.getEnclosures().get(0)).getUrl());
-        Duration duration = ((EntryInformation)entry.getModule(AbstractITunesObject.URI)).getDuration();
-        String durValue = (duration == null) ? "00:00:00" : duration.toString();
-        tmp.setDuration(durValue);
-//        tmp.setDuration(((EntryInformation) entry.getModule(AbstractITunesObject.URI)).getDuration().toString());
-        tmp.setProgress("00:00:00");
-
-        return tmp;
-    }
-
+*/
     public List<Channel> getChannels() { return channels; }
 }
 

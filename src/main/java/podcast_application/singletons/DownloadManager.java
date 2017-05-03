@@ -63,6 +63,8 @@ class DownloadTask implements Runnable {
             URL url = new URL(sourcePath);
             URLConnection connection = url.openConnection();
 
+//            System.out.println("Down: "+sourcePath);
+
             int fileSize = connection.getContentLength();
             if (fileSize < 0) {
                 System.out.println("Could not get the file size");

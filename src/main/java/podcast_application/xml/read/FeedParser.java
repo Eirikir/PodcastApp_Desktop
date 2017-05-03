@@ -1,0 +1,105 @@
+package podcast_application.xml.read;
+
+import com.sun.syndication.feed.module.Module;
+import com.sun.syndication.feed.module.itunes.AbstractITunesObject;
+import com.sun.syndication.feed.module.itunes.EntryInformation;
+import com.sun.syndication.feed.module.itunes.FeedInformation;
+import com.sun.syndication.feed.module.itunes.types.Duration;
+import com.sun.syndication.feed.synd.SyndEnclosure;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.io.SyndFeedInput;
+import com.sun.syndication.io.XmlReader;
+import podcast_application.database.ChannelDB;
+import podcast_application.database.DatabaseManager;
+import podcast_application.xml.model.Channel;
+import podcast_application.xml.model.Item;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+public class FeedParser {
+    private static FeedParser instance = null;
+    private final String LINE_SEPARATOR = "\n";
+
+    private FeedParser() {}
+
+    public Channel parseFEED(File channelFile) {
+        Channel channel = null;
+        try {
+        URL feedSource = channelFile.toURI().toURL();
+
+        SyndFeedInput input = new SyndFeedInput();
+        SyndFeed feed = input.build(new XmlReader(feedSource));
+        Module module = feed.getModule("http://www.itunes.com/dtds/podcast-1.0.dtd");
+        FeedInformation feedInfo = (FeedInformation) module;
+
+        channel = new Channel();
+        channel.setTitle(feed.getTitle());
+
+        // format description (some uses HTML tags)
+        String formattedDescription = feed.getDescription()
+                .replaceAll("\\<.*?\\>", "").trim();
+        channel.setDescription(formattedDescription);
+        channel.setDate(feed.getPublishedDate().toString());
+        channel.setImage(feedInfo.getImage().toString());
+        channel.setLanguage(feed.getLanguage());
+        channel.setLink(feed.getLink());
+
+        ChannelDB db = DatabaseManager.getInstance().getChannelDatabase("./Podcasts/"+feed.getTitle());
+        int dbSize = db.getAmountOfStoredItems();
+
+        List<Item> items = new ArrayList<>();
+        for (Object entry : feed.getEntries()) {
+//                items.add(parseItem((SyndEntry) entry));
+            Item tmp = parseItem((SyndEntry) entry);
+            String val = db.getProgressOfID(tmp.getGuid());
+            if(val != null)
+                tmp.setProgress(val);
+
+            items.add(tmp);
+        }
+
+        channel.setItems(items);
+        channel.setDatabase(db);
+
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return channel;
+    }
+
+    private Item parseItem(SyndEntry entry) {
+        Item tmp = new Item();
+
+        tmp.setGuid(entry.getUri());
+        tmp.setTitle(entry.getTitle());
+
+        // format description (some uses HTML tags)
+        String formattedDescription = entry.getDescription().getValue()
+                .replaceAll("\\<.*?\\>", "").trim()     // remove html tags
+                .split(LINE_SEPARATOR)[0]                                    // remove redundant information
+                ;
+        tmp.setDescription(formattedDescription);
+//        tmp.setDescription(entry.getDescription().getValue());
+
+        tmp.setDate(entry.getPublishedDate());
+        tmp.setLink(((SyndEnclosure) entry.getEnclosures().get(0)).getUrl());
+        Duration duration = ((EntryInformation)entry.getModule(AbstractITunesObject.URI)).getDuration();
+        String durValue = (duration == null) ? "00:00:00" : duration.toString();
+        tmp.setDuration(durValue);
+//        tmp.setDuration(((EntryInformation) entry.getModule(AbstractITunesObject.URI)).getDuration().toString());
+        tmp.setProgress("00:00:00");
+
+        return tmp;
+    }
+
+    public static FeedParser getInstance() {
+        if (instance == null)
+            instance = new FeedParser();
+        return instance;
+    }
+}

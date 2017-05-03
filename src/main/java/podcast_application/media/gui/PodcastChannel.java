@@ -21,7 +21,7 @@ public class PodcastChannel extends ImageView {
     private ChannelDB database;
     private boolean hasDBBeenAltered = false;
     private File directory, episodesList;
-    private String channelTitle;
+    private String channelTitle, channelDescription, sourceRSS;
 
 
     public PodcastChannel(Channel channel, String imagePath) {
@@ -29,6 +29,8 @@ public class PodcastChannel extends ImageView {
         super(new Image("file:" + imagePath, 75, 75, false, true));
 
         this.channelTitle = channel.getTitle();
+        this.channelDescription = channel.getDescription();
+        this.sourceRSS = channel.getLink();
 
         this.directory = new File("./Podcasts/" + channelTitle);
         this.episodesList = new File(directory.getPath() + "/episodes.xml");
@@ -39,6 +41,9 @@ public class PodcastChannel extends ImageView {
     }
 
     public String getChannelTitle() { return channelTitle; }
+    public int getAmountOfEpisodes() { return episodes.size(); }
+    public String getChannelDescription() { return channelDescription; }
+    public String getSourceRSS() { return sourceRSS; }
 
     // adds episode progress to database
     public void storeEpisodeProgress(PodcastEpisode ep) {

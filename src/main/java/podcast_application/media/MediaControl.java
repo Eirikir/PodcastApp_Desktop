@@ -1,11 +1,15 @@
 package podcast_application.media;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
-import podcast_application.media.gui.MediaBar;
-import podcast_application.media.gui.PodcastChannel;
-import podcast_application.media.gui.PodcastEpisode;
+import javafx.scene.layout.HBox;
+import javafx.scene.media.MediaException;
+import podcast_application.database.DatabaseManager;
+import podcast_application.media.gui.*;
 import podcast_application.singletons.ChannelImage;
+import podcast_application.singletons.ChannelManager;
 import podcast_application.xml.model.Channel;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -26,6 +30,7 @@ import java.util.*;
 public class MediaControl extends BorderPane {
     private MediaPlayer mediaPlayer;
     private PodcastEpisode currentEpisode;
+    PodcastEpisode currentlySelected = null; // for toggling details
     private MediaView mediaView;
     private final boolean repeat = false;
     private boolean stopRequested = false;
@@ -33,28 +38,39 @@ public class MediaControl extends BorderPane {
     private Map<String, PodcastChannel> channelsMap = new HashMap<>();
     private PodcastChannel currentChannel;
     private boolean hasStarted = false;
+    private ChannelInfoPane channelInfo;
 
 
 
-    public MediaControl(ListView<PodcastChannel> podcastChannelListView) {
-        for(PodcastChannel pod : podcastChannelListView.getItems())
+    public MediaControl() {
+        ChannelManager channelManager = ChannelManager.getInstance();
+        ListView<PodcastChannel> podcastChannelListView = channelManager.getChannelListView();
+/*        for(PodcastChannel pod : podcastChannelListView.getItems())
             channelsMap.put(pod.getChannelTitle(), pod);
-
+*/
+        channelsMap = channelManager.getChannelsMap();
         setLeft(podcastChannelListView);
+
 
         podcastChannelListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(event.getClickCount() == 1) {
+                if(event.getButton() == MouseButton.PRIMARY) {
 
                     // Use listview's getSelected item
                     currentChannel = podcastChannelListView.getSelectionModel().getSelectedItem();
 
                     loadEpisodes();
+                    channelInfo.changeChannel(currentChannel);
 
                 }
+
+    /*            else if(event.getButton() == MouseButton.SECONDARY) {
+                    channelManager.removeChannel(podcastChannelListView.getSelectionModel().getSelectedItem());
+                } */
             }
         });
+
 
         podcastChannelListView.getSelectionModel().select(0);
         currentChannel = podcastChannelListView.getSelectionModel().getSelectedItem();
@@ -73,7 +89,20 @@ public class MediaControl extends BorderPane {
         mvPane.setStyle("-fx-background-color: black;");
         setCenter(mvPane);
 */
+
+        // NEW
+        channelInfo = new ChannelInfoPane(currentChannel);
+        setTop(channelInfo);
+
+/*        Button addBtn = channelInfo.getAddBtn();
+
+        addBtn.setOnAction(e -> {
+            new AddChannelDialog();
+        });
+*/
+
     }
+
 
     private void loadEpisodes() {
         // list of episodes
@@ -86,37 +115,49 @@ public class MediaControl extends BorderPane {
         episodeListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(event.getButton() == MouseButton.SECONDARY) { // right click (NOT IN USE)
+                if (event.getButton() == MouseButton.SECONDARY) { // right click (NOT IN USE)
                     System.out.println("Clicked");
                 }
-                if(event.getClickCount() == 2) {
 
-                    PodcastEpisode tmp = episodeListView.getSelectionModel().getSelectedItem();
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    if (event.getClickCount() == 1) { // select episode
+                        if (currentlySelected != null)
+                            currentlySelected.toggleDetails();
 
-                    // determine whether the new media can be streamed
-                    if(!tmp.canMediaBeStreamed() && !tmp.isLocalFilePresent()) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setHeaderText(null);
-                        alert.setTitle("Secure connection!");
-                        alert.setContentText("The media you have chosen is using a secure protocol and may not be streamed." +
-                                " In order to listen to this episode you have to download it first!");
-                        alert.show();
-                        return;
+                        currentlySelected = episodeListView.getSelectionModel().getSelectedItem();
+                        currentlySelected.toggleDetails();
                     }
 
-                    storeProgressOfCurrentEpisode();
+                    // load selected episode as media
+                    else if (event.getClickCount() == 2) {
 
-                    // Use listview's getSelected item
-                    currentEpisode.toggleChosen(false); // release lock on media file
-                    currentEpisode = tmp;
-                    currentEpisode.toggleChosen(true);
+                        PodcastEpisode tmp = episodeListView.getSelectionModel().getSelectedItem();
 
-                    mediaPlayer.stop();
-                    mediaPlayer.dispose();
-                    loadMediaPlayer();
+                        // determine whether the new media can be streamed
+                        if (!tmp.canMediaBeStreamed() && !tmp.isLocalFilePresent()) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setHeaderText(null);
+                            alert.setTitle("Secure connection!");
+                            alert.setContentText("The media you have chosen is using a secure protocol and may not be streamed." +
+                                    " In order to listen to this episode you have to download it first!");
+                            alert.show();
+                            return;
+                        }
 
-                    mediaPlayer.play();
+                        storeProgressOfCurrentEpisode();
 
+                        // Use listview's getSelected item
+                        currentEpisode.toggleChosen(false); // release lock on media file
+                        currentEpisode = tmp;
+                        currentEpisode.toggleChosen(true);
+
+                        mediaPlayer.stop();
+                        mediaPlayer.dispose();
+                        loadMediaPlayer();
+
+                        mediaPlayer.play();
+
+                    }
                 }
             }
         });
@@ -137,6 +178,16 @@ public class MediaControl extends BorderPane {
             public void invalidated(Observable ov) {
                 mediaBar.updateValues();
             }
+        });
+
+        mediaPlayer.setOnError(()-> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(null);
+            alert.setTitle("Media Unsupported!");
+            String output = "The media you have chosen is currently unsupported, and cannot be played!"
+                    +"\nError message: " + mediaPlayer.getError().getType();
+            alert.setContentText(output);
+            alert.show();
         });
 
         mediaPlayer.setOnPlaying(new Runnable() {
@@ -204,6 +255,8 @@ public class MediaControl extends BorderPane {
         // save progress of all modified episodes, in each channel
         for (Map.Entry<String, PodcastChannel> entry : channelsMap.entrySet())
             entry.getValue().saveEpisodes();
+
+        DatabaseManager.getInstance().storeSubscriptions();
 
         System.out.println("Save done!");
 
