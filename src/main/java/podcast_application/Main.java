@@ -1,10 +1,7 @@
 package podcast_application;
 
-import com.sun.javafx.application.LauncherImpl;
 import javafx.animation.FadeTransition;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.geometry.Pos;
@@ -21,7 +18,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import podcast_application.database.ChannelDB;
 import podcast_application.media.MediaControl;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -35,14 +31,8 @@ import podcast_application.singletons.DownloadManager;
 import podcast_application.xml.model.Channel;
 import podcast_application.xml.read.RSSParser;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Main extends Application {
 /*    public static final String SPLASH_IMAGE =
@@ -141,9 +131,13 @@ public class Main extends Application {
         mainStage.show();
 
         mainStage.setOnCloseRequest(e -> {
-            if(mediaControl.getHasBeenStarted())
+//            if(mediaControl.getHasBeenStarted())
                 mediaControl.save();
         });
+
+        // Test
+//        new RandomTest();
+//        new DropboxSync();
 
     }
 

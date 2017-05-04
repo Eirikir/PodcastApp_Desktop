@@ -5,16 +5,12 @@ import podcast_application.database.DatabaseManager;
 import podcast_application.singletons.Formatter;
 import podcast_application.xml.model.Channel;
 import podcast_application.xml.model.Item;
-import podcast_application.xml.write.WriteEpisodes;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class PodcastChannel extends ImageView {
     private List<PodcastEpisode> episodes = new ArrayList<>();

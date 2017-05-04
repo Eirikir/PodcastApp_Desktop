@@ -1,6 +1,5 @@
 package podcast_application.xml.model;
 
-import javafx.scene.image.Image;
 import podcast_application.database.ChannelDB;
 
 import java.util.List;

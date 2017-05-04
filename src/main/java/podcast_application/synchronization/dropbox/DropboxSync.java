@@ -9,13 +9,19 @@ import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.users.FullAccount;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Upon application start; iterate through all available files / folders FROM dropbox
+ * and replace local ones if they are older.
+ *
+ * Upon application end; iterate through all local files / folders and replace those
+ * in dropbox which are older.
+ */
 public class DropboxSync {
     private final String ACCESS_TOKEN = "u--SDACy5YgAAAAAAAAuDJmpl4csWGxxH6OCTAw-zBA7EI2Q4hA9eVVLg0KykZdN";
     private DbxClientV2 client;
@@ -45,23 +51,31 @@ public class DropboxSync {
 //                    FileMetadata t = (FileMetadata) meta;
 //                    t.getClientModified();
                 }
-                if(meta instanceof FileMetadata)
-                    System.out.println("File: "+((FileMetadata)meta).getName());
+                if(meta instanceof FileMetadata) {
+                    FileMetadata file = (FileMetadata) meta;
+                    System.out.println("File: " + file.getName() + ", date: "+file.getClientModified());
+                    System.out.println("File path: "+file.getPathDisplay());
+
+                    // new
+//                    File newFile = file;
+//                    Files.copy(Paths.get(file));
+                    downloadFile(new File("./Podcasts"+file.getPathDisplay()), file.getPathDisplay());
+                }
                 else if(meta instanceof FolderMetadata)
                     System.out.println("Folder: "+((FolderMetadata)meta).getName());
             }
 
 
 
-            uploadFile(new File("./Podcasts/subscriptions.xml"), "/subscriptions.xml");
-            uploadFile(new File("./Podcasts/StarTalk Radio/episodes.xml"), "/StarTalk Radio/episodes.xml");
+//            uploadFile(new File("./Podcasts/subscriptions.xml"), "/subscriptions.xml");
+//            uploadFile(new File("./Podcasts/StarTalk Radio/episodes.xml"), "/StarTalk Radio/episodes.xml");
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-
+/*
     private List<Metadata> retrieveAllFiles(DbxClientV2 client) throws IOException, DbxException
     {
         List<Metadata> result = new ArrayList<Metadata>();
@@ -81,11 +95,11 @@ public class DropboxSync {
         }
         return result;
     }
-
+*/
     private ListFolderResult getFiles() throws DbxException {
         // Get files and folder metadata from Dropbox root directory
-        ListFolderResult result = client.files().listFolder("");
-//        ListFolderResult result = client.files().listFolderBuilder("").withRecursive(true).start();
+//        ListFolderResult result = client.files().listFolder("");
+        ListFolderResult result = client.files().listFolderBuilder("").withRecursive(true).start();
         while (true) {
             for (Metadata metadata : result.getEntries()) {
                 System.out.println(metadata.getPathLower());
@@ -101,8 +115,15 @@ public class DropboxSync {
 //        return client.files().listFolderContinue(result.getCursor());
     }
 
+    private void downloadFile(File targetFile, String sourcePath) {
+        try (OutputStream out = new FileOutputStream(targetFile)) {
+            FileMetadata metadata = client.files().downloadBuilder(sourcePath).download(out);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private void uploadFile(File file, String targetPath) {
-        // Upload "test.txt" to dropbox
         try (InputStream in = new FileInputStream(file)) {
             FileMetadata metadata = client.files().uploadBuilder(targetPath).uploadAndFinish(in);
         } catch (Exception ex) {

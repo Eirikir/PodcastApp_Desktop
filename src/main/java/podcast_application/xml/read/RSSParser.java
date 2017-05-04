@@ -2,27 +2,10 @@ package podcast_application.xml.read;
 
 
 
-import com.sun.syndication.feed.module.Module;
-import com.sun.syndication.feed.module.itunes.AbstractITunesObject;
-import com.sun.syndication.feed.module.itunes.EntryInformation;
-import com.sun.syndication.feed.module.itunes.FeedInformation;
-import com.sun.syndication.feed.module.itunes.types.Duration;
-import com.sun.syndication.feed.synd.SyndEnclosure;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
-import podcast_application.database.ChannelDB;
 import podcast_application.database.DatabaseManager;
 import podcast_application.database.SubscriptionsDB;
 import podcast_application.xml.model.Channel;
-import podcast_application.xml.model.Item;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -47,6 +30,7 @@ public class RSSParser {
 
         // Load base channel info from database
         SubscriptionsDB db = DatabaseManager.getInstance().getSubscriptionsDB();
+//        SubscriptionsDB db = DatabaseManager.getInstance().getSubscriptionsDB();
         for (Map.Entry<String, String> entry : db.getSubscriptions().entrySet()) {
             String title = entry.getKey();
             String sourceRSS = entry.getValue();

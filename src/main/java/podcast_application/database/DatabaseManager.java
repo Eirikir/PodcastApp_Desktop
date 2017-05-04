@@ -14,7 +14,7 @@ public class DatabaseManager {
         if(Files.notExists(Paths.get(SUBSCRIPTINS_PATH)))
             subscriptionsDB = new SubscriptionsDB();
 
-        subscriptionsDB = null;
+//        subscriptionsDB = null;
         // read db file
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(SUBSCRIPTINS_PATH))) {
             subscriptionsDB = (SubscriptionsDB) ois.readObject();

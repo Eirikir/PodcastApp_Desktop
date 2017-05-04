@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.scene.control.ListView;
 import podcast_application.database.DatabaseManager;
 import podcast_application.media.gui.PodcastChannel;
-import podcast_application.media.gui.PodcastEpisode;
 
 import java.util.HashMap;
 import java.util.Map;

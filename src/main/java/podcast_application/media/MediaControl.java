@@ -1,16 +1,10 @@
 package podcast_application.media;
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.HBox;
-import javafx.scene.media.MediaException;
 import podcast_application.database.DatabaseManager;
 import podcast_application.media.gui.*;
-import podcast_application.singletons.ChannelImage;
 import podcast_application.singletons.ChannelManager;
-import podcast_application.xml.model.Channel;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -18,12 +12,10 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
-import podcast_application.xml.read.RSSParser;
 
 import java.util.*;
 
