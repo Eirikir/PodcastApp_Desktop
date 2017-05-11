@@ -1,25 +1,13 @@
 package podcast_application.media.gui;
 
-import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableBooleanValue;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.util.Duration;
-import podcast_application.singletons.ChannelManager;
+import podcast_application.management.helpers.ChannelManager;
 
-import java.awt.event.ActionEvent;
 import java.util.Optional;
 
 public class ChannelInfoPane extends BorderPane {

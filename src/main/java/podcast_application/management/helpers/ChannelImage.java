@@ -1,6 +1,4 @@
-package podcast_application.singletons;
-
-import javafx.scene.image.Image;
+package podcast_application.management.helpers;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,8 +6,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class ChannelImage {
     private static ChannelImage channelImage = null;

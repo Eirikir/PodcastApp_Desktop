@@ -18,6 +18,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import podcast_application.management.PodcastManager;
+import podcast_application.management.dropbox.DropboxManager;
 import podcast_application.media.MediaControl;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -25,11 +27,10 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import podcast_application.media.gui.PodcastChannel;
-import podcast_application.singletons.ChannelImage;
-import podcast_application.singletons.ChannelManager;
-import podcast_application.singletons.DownloadManager;
-import podcast_application.xml.model.Channel;
-import podcast_application.xml.read.RSSParser;
+import podcast_application.management.helpers.ChannelImage;
+import podcast_application.management.helpers.ChannelManager;
+import podcast_application.management.helpers.DownloadManager;
+import podcast_application.management.data.model.Channel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +83,8 @@ public class Main extends Application {
                 List<PodcastChannel> loadedChannels = new ArrayList<>();
 
                 updateMessage("Loading Podcast channels...");
-                RSSParser parser = new RSSParser(); // new
+//                RSSParser parser = new RSSParser(); // new
+                PodcastManager parser = PodcastManager.getInstance();
 
                 List<Channel> channels = parser.getChannels();
                 for(Channel c : channels) {
@@ -138,6 +140,7 @@ public class Main extends Application {
         // Test
 //        new RandomTest();
 //        new DropboxSync();
+//        new DropboxManager().updateLocalFiles(null);
 
     }
 

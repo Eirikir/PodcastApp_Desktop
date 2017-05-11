@@ -2,9 +2,9 @@ package podcast_application.media.gui;
 
 import podcast_application.database.ChannelDB;
 import podcast_application.database.DatabaseManager;
-import podcast_application.singletons.Formatter;
-import podcast_application.xml.model.Channel;
-import podcast_application.xml.model.Item;
+import podcast_application.management.helpers.Formatter;
+import podcast_application.management.data.model.Channel;
+import podcast_application.management.data.model.Item;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -29,7 +29,7 @@ public class PodcastChannel extends ImageView {
         this.sourceRSS = channel.getLink();
 
         this.directory = new File("./Podcasts/" + channelTitle);
-        this.episodesList = new File(directory.getPath() + "/episodes.xml");
+        this.episodesList = new File(directory.getPath() + "/episodes.data");
 
         this.database = channel.getDatabase();
 
@@ -54,6 +54,7 @@ public class PodcastChannel extends ImageView {
         if(database.getAmountOfStoredItems() == 0 || !hasDBBeenAltered)
             return;
         System.out.println("Saving episodes of channel '"+channelTitle+"'");
+
         DatabaseManager.getInstance().storeDatabase(database, directory.getPath());
 
     }

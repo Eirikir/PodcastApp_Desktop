@@ -1,4 +1,4 @@
-package podcast_application.singletons;
+package podcast_application.management.helpers;
 
 import javafx.util.Duration;
 
@@ -24,7 +24,7 @@ public class Formatter {
     }
 
     /**
-     * used mainly for formatting strings in xml
+     * used mainly for formatting strings in data
      * @param duration
      * @return
      */

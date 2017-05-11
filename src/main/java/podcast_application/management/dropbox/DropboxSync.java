@@ -1,4 +1,4 @@
-package podcast_application.synchronization.dropbox;
+package podcast_application.management.dropbox;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
@@ -46,7 +46,7 @@ public class DropboxSync {
             ListFolderResult files = getFiles();
             for (Metadata meta : files.getEntries()) {
                 System.out.println("name: "+meta.getName());
-                if(meta.getName().equals("subscriptions.xml")) {
+                if(meta.getName().equals("subscriptions.data")) {
 //                    System.out.println("Exists"+meta.toStringMultiline());
 //                    FileMetadata t = (FileMetadata) meta;
 //                    t.getClientModified();
@@ -67,8 +67,8 @@ public class DropboxSync {
 
 
 
-//            uploadFile(new File("./Podcasts/subscriptions.xml"), "/subscriptions.xml");
-//            uploadFile(new File("./Podcasts/StarTalk Radio/episodes.xml"), "/StarTalk Radio/episodes.xml");
+//            uploadFile(new File("./Podcasts/subscriptions.data"), "/subscriptions.data");
+//            uploadFile(new File("./Podcasts/StarTalk Radio/episodes.data"), "/StarTalk Radio/episodes.data");
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -129,8 +129,8 @@ public class DropboxSync {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-/*        try (InputStream in = new FileInputStream("./Podcasts/subscriptions.xml")) {
-            FileMetadata metadata = client.files().uploadBuilder("/subscriptions.xml").uploadAndFinish(in);
+/*        try (InputStream in = new FileInputStream("./Podcasts/subscriptions.data")) {
+            FileMetadata metadata = client.files().uploadBuilder("/subscriptions.data").uploadAndFinish(in);
         } catch (Exception ex) {
             ex.printStackTrace();
         } */

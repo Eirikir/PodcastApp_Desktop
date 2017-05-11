@@ -1,6 +1,6 @@
 package podcast_application.database;
 
-import podcast_application.xml.model.Channel;
+import podcast_application.management.data.model.Channel;
 
 import java.io.Serializable;
 import java.util.HashMap;

@@ -1,8 +1,5 @@
-package podcast_application.singletons;
+package podcast_application.management.helpers;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.media.Media;
 import podcast_application.media.gui.PodcastEpisode;
 
 import java.io.*;

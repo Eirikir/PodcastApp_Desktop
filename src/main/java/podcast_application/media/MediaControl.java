@@ -4,7 +4,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import podcast_application.database.DatabaseManager;
 import podcast_application.media.gui.*;
-import podcast_application.singletons.ChannelManager;
+import podcast_application.management.helpers.ChannelManager;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;

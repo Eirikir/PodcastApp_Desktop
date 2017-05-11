@@ -1,14 +1,13 @@
 package podcast_application.media.gui;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import podcast_application.singletons.ChannelImage;
-import podcast_application.singletons.ChannelManager;
-import podcast_application.xml.model.Channel;
-import podcast_application.xml.read.FeedParser;
+import podcast_application.management.helpers.ChannelImage;
+import podcast_application.management.helpers.ChannelManager;
+import podcast_application.management.data.model.Channel;
+import podcast_application.management.data.read.FeedParser;
 
 import java.io.File;
 import java.io.FileOutputStream;

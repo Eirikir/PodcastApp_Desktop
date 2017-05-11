@@ -1,20 +1,17 @@
 package podcast_application.media.gui;
 
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
-import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.util.Duration;
-import podcast_application.singletons.DownloadManager;
-import podcast_application.singletons.Formatter;
-import podcast_application.xml.model.Item;
+import podcast_application.management.helpers.DownloadManager;
+import podcast_application.management.helpers.Formatter;
+import podcast_application.management.data.model.Item;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

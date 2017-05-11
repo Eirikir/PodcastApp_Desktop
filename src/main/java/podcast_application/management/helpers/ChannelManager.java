@@ -1,4 +1,4 @@
-package podcast_application.singletons;
+package podcast_application.management.helpers;
 
 import javafx.application.Platform;
 import javafx.scene.control.ListView;

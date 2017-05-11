@@ -1,4 +1,4 @@
-package podcast_application.xml.model;
+package podcast_application.management.data.model;
 
 import java.util.Date;
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+	<head>
+		<title>Podcast Subscriptions</title>
+	</head>
+	<body>
+		<outline title="StarTalk Radio" text="StarTalk Radio" type="rss" xmlUrl="http://feeds.soundcloud.com/users/soundcloud:users:38128127/sounds.rss"></outline>
+		<outline title="The Nerdist" text="The Nerdist" type="rss" xmlUrl="http://nerdist.libsyn.com/rss"></outline>
+		<outline title="The Bugle" text="The Bugle" type="rss" xmlUrl="http://feeds.thebuglepodcast.com/thebuglefeed"></outline>
+		<outline title="Beautiful Stories From Anonymous People" text="Beautiful Stories From Anonymous People" type="rss" xmlUrl="http://rss.earwolf.com/beautiful-anonymous"></outline>
+	</body>
+</opml>
