@@ -46,7 +46,7 @@ public class FeedParser {
             channel.setDate(feed.getPublishedDate().toString());
             channel.setImage(feedInfo.getImage().toString());
             channel.setLanguage(feed.getLanguage());
-            channel.setLink(feed.getLink());
+//            channel.setLink(feed.getLink());
 
             ChannelDB db = DatabaseManager.getInstance().getChannelDatabase("./Podcasts/"+feed.getTitle());
             int dbSize = db.getAmountOfStoredItems();

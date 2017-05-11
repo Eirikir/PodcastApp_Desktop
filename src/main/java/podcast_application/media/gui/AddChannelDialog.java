@@ -87,6 +87,7 @@ public class AddChannelDialog extends TextInputDialog {
 
 
             channel = FeedParser.getInstance().parseFEED(tmpFile);
+            channel.setLink(url);
 
             // create channel directory (if missing) and copy local file into dir
             String channelPath = "./Podcasts/"+channel.getTitle();

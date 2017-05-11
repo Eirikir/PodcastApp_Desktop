@@ -25,6 +25,7 @@ public class ChannelManager {
             channelListView.getItems().add(channel);
             channelsMap.put(channel.getChannelTitle(), channel);
             DatabaseManager.getInstance().addSubscription(channel.getChannelTitle(), channel.getSourceRSS());
+            System.out.println("adding: "+channel.getSourceRSS());
         });
     }
 

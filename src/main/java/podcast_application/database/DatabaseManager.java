@@ -36,7 +36,7 @@ public class DatabaseManager {
             if (!dropboxManager.getFile(subFile) && useDropbox) // no dropbox file
                 writeDefaultFiles();
 
-            writeDefaultFiles();
+//            writeDefaultFiles();
         }
 
 //        subscriptionsDB = new ReadWriteSubscriptions().readSubscriptionsFile(subFile);
@@ -46,8 +46,8 @@ public class DatabaseManager {
 
 //        readSubscriptionsFile(subFile);
 
-//        if(useDropbox)
-//            dropboxManager.syncFile(subFile); // sync file based on last modification
+        if(useDropbox)
+            dropboxManager.syncFile(subFile); // sync file based on last modification
 
     }
 
