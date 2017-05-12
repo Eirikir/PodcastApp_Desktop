@@ -1,7 +1,7 @@
 package podcast_application.database;
 
-import podcast_application.management.data.read.SubscriptionsParser;
-import podcast_application.management.data.write.SubscriptionsBuilder;
+import podcast_application.management.data.read.OPMLParser;
+import podcast_application.management.data.write.OPMLBuilder;
 import podcast_application.management.dropbox.DropboxManager;
 
 import java.io.*;
@@ -15,7 +15,7 @@ public class DatabaseManager {
     private final String BASE_PATH = "./Podcasts/";
     private SubscriptionsDB subscriptionsDB;
     private boolean subscriptionsAltered = false; // to know whether we should save / sync db
-    private boolean useDropbox = true; // should we sync through dropbox?
+    private boolean useDropbox = false; // should we sync through dropbox?
     private final String SUBSCRIPTIONS_PATH = "./Podcasts/subscriptions.opml";
 
     private DatabaseManager() {
@@ -40,8 +40,7 @@ public class DatabaseManager {
         }
 
 //        subscriptionsDB = new ReadWriteSubscriptions().readSubscriptionsFile(subFile);
-        subscriptionsDB = new SubscriptionsParser().readSubscriptions(subFile);
-
+        subscriptionsDB = new OPMLParser().readSubscriptions(subFile);
 
 
 //        readSubscriptionsFile(subFile);
@@ -123,7 +122,8 @@ public class DatabaseManager {
         File file = new File(SUBSCRIPTIONS_PATH);
 
         // save altered database
-        new SubscriptionsBuilder().write(file, subscriptionsDB);
+//        new OPMLBuilder().write(file, subscriptionsDB);
+        new OPMLBuilder().writeSubscriptions(file, subscriptionsDB);
 
         System.out.println("Subscriptions saved");
 

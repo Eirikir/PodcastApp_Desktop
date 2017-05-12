@@ -11,10 +11,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Map;
 
-public class SubscriptionsParser {
+public class OPMLParser {
     private final String OUTLINE = "outline", TITLE = "title", URL = "xmlUrl";
 
-    public SubscriptionsParser() {}
+    public OPMLParser() {}
 
     public SubscriptionsDB readSubscriptions(File file) {
         SubscriptionsDB subscriptionsDB = new SubscriptionsDB();
