@@ -26,6 +26,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import podcast_application.media.gui.ChannelInterface;
 import podcast_application.media.gui.PodcastChannel;
 import podcast_application.management.helpers.ChannelImage;
 import podcast_application.management.helpers.ChannelManager;
@@ -77,10 +78,10 @@ public class Main extends Application {
     @Override
     public void start(final Stage initStage) throws Exception {
 
-        final Task<ListView<PodcastChannel>> loadChannels = new Task<ListView<PodcastChannel>>() {
+        final Task<ListView<ChannelInterface>> loadChannels = new Task<ListView<ChannelInterface>>() {
             @Override
-            protected ListView<PodcastChannel> call() throws InterruptedException {
-                List<PodcastChannel> loadedChannels = new ArrayList<>();
+            protected ListView<ChannelInterface> call() throws InterruptedException {
+                List<ChannelInterface> loadedChannels = new ArrayList<>();
 
                 updateMessage("Loading Podcast channels...");
 //                RSSParser parser = new RSSParser(); // new
@@ -93,7 +94,7 @@ public class Main extends Application {
                 }
 
 
-                ListView<PodcastChannel> podcastChannelListView = new ListView<>();
+                ListView<ChannelInterface> podcastChannelListView = new ListView<>();
                 podcastChannelListView.getStyleClass().add("channelList");
 
                 podcastChannelListView.setItems(FXCollections.observableArrayList(loadedChannels));
@@ -114,7 +115,7 @@ public class Main extends Application {
         new Thread(loadChannels).start();
     }
 
-    private void showMainStage(ListView<PodcastChannel> podcastChannelListView) {
+    private void showMainStage(ListView<ChannelInterface> podcastChannelListView) {
         mainStage = new Stage(StageStyle.DECORATED);
         mainStage.setTitle("PodRunner");
         mainStage.getIcons().add(new Image("/images/microphone-1.png"));

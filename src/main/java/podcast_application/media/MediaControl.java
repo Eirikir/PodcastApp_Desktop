@@ -1,7 +1,10 @@
 package podcast_application.media;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.VBox;
 import podcast_application.database.DatabaseManager;
 import podcast_application.media.gui.*;
 import podcast_application.management.helpers.ChannelManager;
@@ -22,26 +25,49 @@ import java.util.*;
 public class MediaControl extends BorderPane {
     private MediaPlayer mediaPlayer;
     private PodcastEpisode currentEpisode;
-    PodcastEpisode currentlySelected = null; // for toggling details
-    private MediaView mediaView;
+    private PodcastEpisode currentlySelected = null; // for toggling details
+//    private MediaView mediaView;
     private final boolean repeat = false;
     private boolean stopRequested = false;
     private boolean atEndOfMedia = false;
-    private Map<String, PodcastChannel> channelsMap = new HashMap<>();
-    private PodcastChannel currentChannel;
+    private Map<String, ChannelInterface> channelsMap = new HashMap<>();
+    private ChannelInterface currentChannel;
     private boolean hasStarted = false;
     private ChannelInfoPane channelInfo;
+//    private Playlist playList;
 
 
 
     public MediaControl() {
         ChannelManager channelManager = ChannelManager.getInstance();
-        ListView<PodcastChannel> podcastChannelListView = channelManager.getChannelListView();
-/*        for(PodcastChannel pod : podcastChannelListView.getItems())
-            channelsMap.put(pod.getChannelTitle(), pod);
-*/
+        ListView<ChannelInterface> podcastChannelListView = channelManager.getChannelListView();
+
         channelsMap = channelManager.getChannelsMap();
+//        setLeft(podcastChannelListView);
+
+
+
+        Playlist playList = Playlist.getInstance();
+/*        VBox  channelBox = new VBox(playList, podcastChannelListView);
+        channelBox.setId("channelBox");
+        channelBox.setAlignment(Pos.TOP_CENTER);
+
+        setLeft(channelBox);
+*/
+        podcastChannelListView.getItems().add(0, playList);
         setLeft(podcastChannelListView);
+
+        playList.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(event.getButton() == MouseButton.PRIMARY) {
+                    currentChannel = playList;
+
+                    loadEpisodes();
+                    channelInfo.changeChannel(currentChannel);
+                }
+            }
+        });
 
 
         podcastChannelListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -56,15 +82,18 @@ public class MediaControl extends BorderPane {
                     channelInfo.changeChannel(currentChannel);
 
                 }
+/*
+                else if(event.getButton() == MouseButton.SECONDARY) {
 
-    /*            else if(event.getButton() == MouseButton.SECONDARY) {
-                    channelManager.removeChannel(podcastChannelListView.getSelectionModel().getSelectedItem());
+//                    channelManager.removeChannel(podcastChannelListView.getSelectionModel().getSelectedItem());
                 } */
             }
         });
 
 
-        podcastChannelListView.getSelectionModel().select(0);
+        // if playlist is not empty, load it first
+        int idx = (playList.getAmountOfEpisodes() == 0) ? 1 : 0;
+        podcastChannelListView.getSelectionModel().select(idx);
         currentChannel = podcastChannelListView.getSelectionModel().getSelectedItem();
 
         loadEpisodes();
@@ -74,18 +103,16 @@ public class MediaControl extends BorderPane {
         loadMediaPlayer();
 
 
-/*
-        mediaView = new MediaView(mediaPlayer);
-        Pane mvPane = new Pane() {                };
-        mvPane.getChildren().add(mediaView);
-        mvPane.setStyle("-fx-background-color: black;");
-        setCenter(mvPane);
-*/
-
-        // NEW
+        // Channel info pane
         channelInfo = new ChannelInfoPane(currentChannel);
         setTop(channelInfo);
 
+/*        Button playListBtn = new Button();
+        playListBtn.getStyleClass().add("fileBtnClass");
+        playListBtn.setId("playListBtn");
+
+        setTop(new VBox(channelInfo, playListBtn));
+*/
 /*        Button addBtn = channelInfo.getAddBtn();
 
         addBtn.setOnAction(e -> {
@@ -107,9 +134,10 @@ public class MediaControl extends BorderPane {
         episodeListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                /*
                 if (event.getButton() == MouseButton.SECONDARY) { // right click (NOT IN USE)
-                    System.out.println("Clicked");
                 }
+                */
 
                 if (event.getButton() == MouseButton.PRIMARY) {
                     if (event.getClickCount() == 1) { // select episode
@@ -237,16 +265,24 @@ public class MediaControl extends BorderPane {
 
     private void storeProgressOfCurrentEpisode() {
         // store progress of current episode if needed
-        if(currentEpisode.updateProgress(mediaPlayer.getCurrentTime()))
-            channelsMap.get(currentEpisode.getChannelName()).storeEpisodeProgress(currentEpisode);
+        if(currentEpisode.updateProgress(mediaPlayer.getCurrentTime())) {
+            PodcastChannel tmp = (PodcastChannel) channelsMap.get(currentEpisode.getChannelName());
+            tmp.storeEpisodeProgress(currentEpisode);
+//            channelsMap.get(currentEpisode.getChannelName()).storeEpisodeProgress(currentEpisode);
+        }
     }
 
     public void save() {
         storeProgressOfCurrentEpisode();
 
         // save progress of all modified episodes, in each channel
-        for (Map.Entry<String, PodcastChannel> entry : channelsMap.entrySet())
-            entry.getValue().saveEpisodes();
+        for (Map.Entry<String, ChannelInterface> entry : channelsMap.entrySet()) {
+/*            ChannelInterface tmp = entry.getValue();
+            if(tmp instanceof PodcastChannel)
+                ((PodcastChannel) tmp).saveEpisodes();
+                */
+            entry.getValue().save();
+        }
 
         DatabaseManager.getInstance().storeSubscriptions();
 

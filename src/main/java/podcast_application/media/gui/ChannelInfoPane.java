@@ -1,5 +1,6 @@
 package podcast_application.media.gui;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -14,15 +15,16 @@ public class ChannelInfoPane extends BorderPane {
     private Label title = new Label(), episodesAmount = new Label(),
             description = new Label();
 
-    private PodcastChannel currentlySelected;
+    private ChannelInterface currentlySelected;
 
     private boolean showDetails = false;
-    private Button addBtn, removeBtn;
+    private VBox subBox;
+    private Button addBtn, removeBtn, detailsBtn;
 
     public Button getAddBtn() { return addBtn; }
     public Button getRemoveBtn() { return removeBtn; }
 
-    public ChannelInfoPane(PodcastChannel channel) {
+    public ChannelInfoPane(ChannelInterface channel) {
         this.getStyleClass().add("channelInfoPane");
         currentlySelected = channel;
 
@@ -48,12 +50,12 @@ public class ChannelInfoPane extends BorderPane {
 
             Optional<ButtonType> result = alert.showAndWait();
             if(result.get() == ButtonType.OK) {
-                ChannelManager.getInstance().removeChannel(currentlySelected);
+                ChannelManager.getInstance().removeChannel((PodcastChannel) currentlySelected);
+                Platform.runLater(()-> {
+                    changeChannel(ChannelManager.getInstance().getSelected());
+                });
+
             }
-//            ChannelManager man = ChannelManager.getInstance();
-//            man.removeChannel(currentlySelected);
-//            currentlySelected = man.getSelected();
-//            currentlySelected = man.removeAndGetChannel(currentlySelected);
         });
 
         removeBtn.setManaged(false);
@@ -72,7 +74,7 @@ public class ChannelInfoPane extends BorderPane {
         title.getStyleClass().add(LABEL_CLASS);
         title.setId("channelInfoTitle");
 
-        Button detailsBtn = new Button();
+        detailsBtn = new Button();
 
         detailsBtn.getStyleClass().add("smallBtnClass");
         detailsBtn.setId("infoBtnDown");
@@ -86,7 +88,7 @@ public class ChannelInfoPane extends BorderPane {
         description.setId("channelInfoDesc");
         description.setWrapText(true);
 
-        VBox subBox = new VBox(description);
+        subBox = new VBox(description);
 //        description.setVisible(false);
 //        subBox.visibleProperty().bind(showDetails);
         subBox.setManaged(false);
@@ -104,26 +106,49 @@ public class ChannelInfoPane extends BorderPane {
         setRight(episodesAmount);
 
         detailsBtn.setOnAction(e -> {
-            showDetails = (showDetails) ? false : true;
+            toggleDetails();
+/*            showDetails = (showDetails) ? false : true;
             subBox.setManaged(showDetails);
             subBox.setVisible(showDetails);
 
-            removeBtn.setManaged(showDetails);
-            removeBtn.setVisible(showDetails);
+            // we may not delete playlist channel
+            if(!currentlySelected.getChannelTitle().equals("Playlist")) {
+                removeBtn.setManaged(showDetails);
+                removeBtn.setVisible(showDetails);
+            }
 
             String id = (showDetails) ? "infoBtnUp" : "infoBtnDown";
             detailsBtn.setId(id);
+*/
         });
 
         changeChannel(channel);
     }
 
+    private void toggleDetails() {
+        showDetails = (showDetails) ? false : true;
+        subBox.setManaged(showDetails);
+        subBox.setVisible(showDetails);
+
+        // we may not delete playlist channel
+        if(!currentlySelected.getChannelTitle().equals("Playlist")) {
+            removeBtn.setManaged(showDetails);
+            removeBtn.setVisible(showDetails);
+        }
+
+        String id = (showDetails) ? "infoBtnUp" : "infoBtnDown";
+        detailsBtn.setId(id);
+    }
 
 
-    public void changeChannel(PodcastChannel channel) {
+    public void changeChannel(ChannelInterface channel) {
+        if(showDetails)
+            toggleDetails();
+
         currentlySelected = channel;
         title.setText(channel.getChannelTitle());
         episodesAmount.setText(channel.getAmountOfEpisodes()+" episodes");
         description.setText(channel.getChannelDescription());
+
     }
 }

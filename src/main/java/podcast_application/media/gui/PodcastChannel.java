@@ -12,7 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PodcastChannel extends ImageView {
+public class PodcastChannel extends ImageView implements ChannelInterface {
     private List<PodcastEpisode> episodes = new ArrayList<>();
     private ChannelDB database;
     private boolean hasDBBeenAltered = false;
@@ -50,7 +50,7 @@ public class PodcastChannel extends ImageView {
             hasDBBeenAltered = true;
     }
 
-    public void saveEpisodes() {
+    public void save() {
         if(database.getAmountOfStoredItems() == 0 || !hasDBBeenAltered)
             return;
         System.out.println("Saving episodes of channel '"+channelTitle+"'");

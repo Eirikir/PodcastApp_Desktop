@@ -1,5 +1,6 @@
 package podcast_application.media.gui;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,7 +24,7 @@ public class PodcastEpisode extends BorderPane {
     private Path filePath;
     private String title, description, pubDate, link, guid, channelName;
     private Duration progress, duration;
-    private boolean downloading = false;
+    private boolean downloading = false, isInPlaylist = false;
     private Button fileBtn;
 
     // for details view
@@ -100,9 +101,14 @@ public class PodcastEpisode extends BorderPane {
         progressIndicator.getStyleClass().add("downloadIndicator");
         progressIndicator.setVisible(false);
 
-        StackPane rightBox = new StackPane(fileBtn, progressIndicator);
-        rightBox.setPrefSize(30,30);
-        rightBox.setAlignment(Pos.CENTER_RIGHT);
+        StackPane stackBox = new StackPane(fileBtn, progressIndicator);
+        stackBox.setPrefSize(30,30);
+        stackBox.setAlignment(Pos.CENTER_RIGHT);
+
+        // playlist button
+        Button playlistBtn = createPlayListBtn();
+
+        HBox rightBox = new HBox(playlistBtn, stackBox);
 
         HBox textBox = new HBox();
 
@@ -182,6 +188,33 @@ public class PodcastEpisode extends BorderPane {
 
             }
         });
+    }
+
+    private Button createPlayListBtn() {
+        Button playlistBtn = new Button();
+        playlistBtn.getStyleClass().add("smallBtnClass");
+
+        if(isInPlaylist)
+            playlistBtn.setId("playListBtnRemove");
+        else
+            playlistBtn.setId("playListBtnAdd");
+
+        playlistBtn.setOnAction((e) -> {
+            Playlist list = Playlist.getInstance();
+            isInPlaylist = list.containsEpisode(this);
+
+            if(isInPlaylist) {
+                list.removeEpisode(this);
+                playlistBtn.setId("playListBtnAdd");
+
+            } else {
+                list.addEpisode(this);
+                playlistBtn.setId("playListBtnRemove");
+            }
+
+        });
+
+        return playlistBtn;
     }
 
 

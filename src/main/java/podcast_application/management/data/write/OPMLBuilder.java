@@ -17,14 +17,13 @@ import java.util.Map;
  *  As this is not posible using *Iterator API' the 'Cursor API' will be used.
  */
 public class OPMLBuilder {
-
+    final String OPML = "opml", BREAK = "\n", TAB = "\t";
     /**
      * Cursor API
      * @param file
      * @param subscriptionsDB
      */
     public void writeSubscriptions(File file, SubscriptionsDB subscriptionsDB) {
-        final String OPML = "opml", BREAK = "\n", TAB = "\t";
 
         try {
             // create an XMLOutputFactory
@@ -34,25 +33,8 @@ public class OPMLBuilder {
 //            XMLStreamWriter writer = factory.createXMLStreamWriter(new FileWriter(file));
             XMLStreamWriter writer = factory.createXMLStreamWriter(new FileOutputStream(file), "UTF-8");
 
-            writer.writeStartDocument("UTF-8", "1.0");
-
-            writer.writeDTD(BREAK);
-            writer.writeStartElement(OPML);
-            writer.writeAttribute("version", "2.0");
-
-
-            // write head
-            writer.writeDTD(BREAK+TAB);
-            writer.writeStartElement("head");
-
-            writer.writeDTD(BREAK+TAB+TAB);
-            writer.writeStartElement("title");
-            writer.writeCharacters("Podcast Subscriptions");
-            writer.writeEndElement();
-
-            writer.writeDTD(BREAK+TAB);
-            writer.writeEndElement(); // end head
-
+            // write start doc and head part
+            writeStart(writer);
 
             // write body
             writer.writeDTD(BREAK+TAB);
@@ -88,6 +70,29 @@ public class OPMLBuilder {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+//    public void writePlaylist(File)
+
+    private void writeStart(XMLStreamWriter writer) throws XMLStreamException {
+        writer.writeStartDocument("UTF-8", "1.0");
+
+        writer.writeDTD(BREAK);
+        writer.writeStartElement(OPML);
+        writer.writeAttribute("version", "2.0");
+
+
+        // write head
+        writer.writeDTD(BREAK+TAB);
+        writer.writeStartElement("head");
+
+        writer.writeDTD(BREAK+TAB+TAB);
+        writer.writeStartElement("title");
+        writer.writeCharacters("Podcast Subscriptions");
+        writer.writeEndElement();
+
+        writer.writeDTD(BREAK+TAB);
+        writer.writeEndElement(); // end head
     }
 
 }

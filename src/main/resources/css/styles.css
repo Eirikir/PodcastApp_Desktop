@@ -25,10 +25,11 @@
     -fx-padding: 0px;
     -fx-border-width: 0px;
     -fx-background-insets: 0;
+    -fx-control-inner-background: black;
 }
 
 .channelList .list-cell {
-    -fx-control-inner-background: black;
+//    -fx-control-inner-background: black;
     -fx-padding: 0px;
 }
 
@@ -103,6 +104,18 @@
 //    -fx-background-position: 90%;
     -fx-pref-width: 20px;
     -fx-pref-height: 20px;
+}
+
+#playListBtnAdd {
+    -fx-background-image: url('../images/star_outline-32.png');
+}
+
+#playListBtnRemove {
+    -fx-background-image: url('../images/star-32.png');
+}
+
+#channelBox {
+    -fx-background-color: black;
 }
 
 #downloadBtn {
