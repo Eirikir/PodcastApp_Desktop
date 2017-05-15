@@ -4,6 +4,7 @@ import podcast_application.database.SubscriptionsDB;
 
 import javax.xml.stream.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.Map;
 
@@ -30,7 +31,8 @@ public class OPMLBuilder {
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
 
             // create stream writer
-            XMLStreamWriter writer = factory.createXMLStreamWriter(new FileWriter(file));
+//            XMLStreamWriter writer = factory.createXMLStreamWriter(new FileWriter(file));
+            XMLStreamWriter writer = factory.createXMLStreamWriter(new FileOutputStream(file), "UTF-8");
 
             writer.writeStartDocument("UTF-8", "1.0");
 

@@ -17,7 +17,8 @@ public class ChannelDB implements Serializable {
     public String getProgressOfID(String guid) {
         if(episodesProgress.containsKey(guid))
             return episodesProgress.get(guid);
-        return null;
+        return "00:00:00"; // not found
+//        return null;
     }
 
     public void printEpisodes() {
@@ -25,7 +26,6 @@ public class ChannelDB implements Serializable {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             System.out.println(pair.getKey() + " = " + pair.getValue());
-//            it.remove(); // avoids a ConcurrentModificationException
         }
     }
 }

@@ -13,7 +13,7 @@ import com.sun.syndication.io.XmlReader;
 import podcast_application.database.ChannelDB;
 import podcast_application.database.DatabaseManager;
 import podcast_application.management.data.model.Channel;
-import podcast_application.management.data.model.Item;
+import podcast_application.management.data.model.Episode;
 
 import java.io.File;
 import java.net.URL;
@@ -48,21 +48,17 @@ public class FeedParser {
             channel.setLanguage(feed.getLanguage());
 //            channel.setLink(feed.getLink());
 
-            ChannelDB db = DatabaseManager.getInstance().getChannelDatabase("./Podcasts/"+feed.getTitle());
-            int dbSize = db.getAmountOfStoredItems();
+            ChannelDB db = DatabaseManager.getInstance().getChannelDatabase(feed.getTitle());
 
-            List<Item> items = new ArrayList<>();
+            List<Episode> episodes = new ArrayList<>();
             for (Object entry : feed.getEntries()) {
-    //                items.add(parseItem((SyndEntry) entry));
-                Item tmp = parseItem((SyndEntry) entry);
-                String val = db.getProgressOfID(tmp.getGuid());
-                if(val != null)
-                    tmp.setProgress(val);
-
-                items.add(tmp);
+                Episode tmp = parseItem((SyndEntry) entry);
+                String progress = db.getProgressOfID(tmp.getGuid());
+                tmp.setProgress(progress);
+                episodes.add(tmp);
             }
 
-            channel.setItems(items);
+            channel.setItems(episodes);
             channel.setDatabase(db);
 
 
@@ -72,8 +68,8 @@ public class FeedParser {
     return channel;
     }
 
-    private Item parseItem(SyndEntry entry) {
-        Item tmp = new Item();
+    private Episode parseItem(SyndEntry entry) {
+        Episode tmp = new Episode();
 
         tmp.setGuid(entry.getUri());
         tmp.setTitle(entry.getTitle());
@@ -81,18 +77,15 @@ public class FeedParser {
         // format description (some uses HTML tags)
         String formattedDescription = entry.getDescription().getValue()
                 .replaceAll("\\<.*?\\>", "").trim()     // remove html tags
-                .split(LINE_SEPARATOR)[0]                                    // remove redundant information
+                .split(LINE_SEPARATOR)[0]                                 // remove redundant information
                 ;
         tmp.setDescription(formattedDescription);
-//        tmp.setDescription(entry.getDescription().getValue());
 
         tmp.setDate(entry.getPublishedDate());
         tmp.setLink(((SyndEnclosure) entry.getEnclosures().get(0)).getUrl());
         Duration duration = ((EntryInformation)entry.getModule(AbstractITunesObject.URI)).getDuration();
         String durValue = (duration == null) ? "00:00:00" : duration.toString();
         tmp.setDuration(durValue);
-//        tmp.setDuration(((EntryInformation) entry.getModule(AbstractITunesObject.URI)).getDuration().toString());
-        tmp.setProgress("00:00:00");
 
         return tmp;
     }

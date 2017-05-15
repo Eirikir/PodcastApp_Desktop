@@ -11,7 +11,7 @@ import javafx.scene.text.*;
 import javafx.util.Duration;
 import podcast_application.management.helpers.DownloadManager;
 import podcast_application.management.helpers.Formatter;
-import podcast_application.management.data.model.Item;
+import podcast_application.management.data.model.Episode;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,7 +34,7 @@ public class PodcastEpisode extends BorderPane {
     private final String ID_DOWNLOAD = "downloadBtn", ID_DELETE = "deleteBtn", ID_PLAYING = "playingBtn";
     private ProgressIndicator progressIndicator;
 
-    public PodcastEpisode(Item item, String basePath, String channelName) {
+    public PodcastEpisode(Episode item, String basePath, String channelName) {
         super();
 
         guid = item.getGuid();

@@ -33,7 +33,10 @@ public class DatabaseManager {
         File subFile = new File(SUBSCRIPTIONS_PATH);
         // does the file exist locally?
         if(!subFile.exists()) { // no local file
-            if (!dropboxManager.getFile(subFile) && useDropbox) // no dropbox file
+            if(!useDropbox)
+                writeDefaultFiles();
+
+            else if (!dropboxManager.getFile(subFile)) // no dropbox file
                 writeDefaultFiles();
 
 //            writeDefaultFiles();
@@ -76,7 +79,7 @@ public class DatabaseManager {
     }
 
     public ChannelDB getChannelDatabase(String path) {
-        String dbPath = path + DB_NAME;
+        String dbPath = BASE_PATH + path + DB_NAME;
         if(Files.notExists(Paths.get(dbPath)))
             return new ChannelDB();
 
@@ -113,6 +116,16 @@ public class DatabaseManager {
         subscriptionsDB.removeSubscription(title);
         if(!subscriptionsAltered)
             subscriptionsAltered = true;
+
+        // remove local files for subscription
+        File dir = new File("./Podcasts/"+title+"/");
+        if (dir.exists()) {
+            for (File f : dir.listFiles())
+                f.delete();
+            dir.delete();
+        }
+        else
+            System.out.println("not found...");
     }
 
     public void storeSubscriptions() {

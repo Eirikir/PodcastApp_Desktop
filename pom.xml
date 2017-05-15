@@ -6,7 +6,7 @@
 
     <groupId>org.erst0704.podcast</groupId>
     <artifactId>PodcastApp_Desktop</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <!--
     <properties>
@@ -52,7 +52,7 @@
                             <goal>build-jar</goal>
                         </goals>
                     </execution>
-                    <!--
+
                     <execution>
                      <id>create-native</id>
                         <phase>package</phase>
@@ -60,7 +60,7 @@
                             <goal>build-native</goal>
                         </goals>
                     </execution>
-                    -->
+
                 </executions>
             </plugin>
         </plugins>

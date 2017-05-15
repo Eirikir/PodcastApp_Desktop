@@ -2,7 +2,7 @@ package podcast_application.management.data.model;
 
 import java.util.Date;
 
-public class Item {
+public class Episode {
     private String title, description, link, duration, progress, guid;
     private Date date;
 

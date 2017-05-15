@@ -35,7 +35,7 @@ public class OPMLParser {
                 if(event.isStartElement()) {
                     StartElement startElement = event.asStartElement();
 
-                    // If we have an item element, we create a new channel
+                    // If we have an outline element, we create a new channel
                     if(startElement.getName().getLocalPart().equals(OUTLINE)) {
                         title = event.asStartElement().getAttributeByName(new QName(TITLE)).getValue();
                         source_rss = event.asStartElement().getAttributeByName(new QName(URL)).getValue();
@@ -43,7 +43,7 @@ public class OPMLParser {
 
                 }
 
-                // If we reach the end of an item element, we add it to the list
+                // If we reach the end of an outline element, we add it to the list
                 if (event.isEndElement()) {
                     EndElement endElement = event.asEndElement();
                     if (endElement.getName().getLocalPart().equals(OUTLINE)) {
@@ -51,7 +51,7 @@ public class OPMLParser {
                     }
                 }
             }
-            in.close();
+            eventReader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

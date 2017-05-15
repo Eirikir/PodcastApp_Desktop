@@ -4,7 +4,7 @@ import podcast_application.database.ChannelDB;
 import podcast_application.database.DatabaseManager;
 import podcast_application.management.helpers.Formatter;
 import podcast_application.management.data.model.Channel;
-import podcast_application.management.data.model.Item;
+import podcast_application.management.data.model.Episode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -59,8 +59,8 @@ public class PodcastChannel extends ImageView {
 
     }
 
-    private void populateList(List<Item> list) {
-        for (Item m : list)
+    private void populateList(List<Episode> list) {
+        for (Episode m : list)
             episodes.add(new PodcastEpisode(m, directory.getPath(), channelTitle));
     }
 

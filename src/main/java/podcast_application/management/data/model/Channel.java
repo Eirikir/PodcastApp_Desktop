@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Channel {
     private String title, link, description, language, date, image;
-    private List<Item> items;
+    private List<Episode> items;
     private ChannelDB database;
 
     public ChannelDB getDatabase() {
@@ -67,7 +67,7 @@ public class Channel {
         this.image = image;
     }
 
-    public void setItems(List<Item> items) { this.items = items; }
-    public List<Item> getItems() { return items; }
+    public void setItems(List<Episode> items) { this.items = items; }
+    public List<Episode> getItems() { return items; }
 
 }
