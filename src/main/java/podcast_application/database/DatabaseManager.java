@@ -11,16 +11,32 @@ import java.nio.file.StandardCopyOption;
 
 public class DatabaseManager {
     private static DatabaseManager instance = null;
-    private final String DB_NAME = "/db.dat";
-    private final String BASE_PATH = "./Podcasts/";
+//    private final String DB_NAME = "/db.dat";
+//    private final String BASE_PATH = "./Podcasts/";
     private SubscriptionsDB subscriptionsDB;
+    private PlaylistDB playlistDB;
     private boolean subscriptionsAltered = false; // to know whether we should save / sync db
     private boolean useDropbox = false; // should we sync through dropbox?
-    private final String SUBSCRIPTIONS_PATH = "./Podcasts/subscriptions.opml";
+    private final String BASE_PATH = "./Podcasts/",
+            SUBSCRIPTIONS_PATH = BASE_PATH+"subscriptions.opml", PLAYLIST_PATH = BASE_PATH+"playlist.opml",
+            DB_NAME = "/db.dat";
 
     private DatabaseManager() {
+        playlistDB = loadPlaylist();
+
         // load subscriptions file
         loadSubscriptions();
+    }
+
+    private PlaylistDB loadPlaylist() {
+        File file = new File(PLAYLIST_PATH);
+        if(!file.exists())
+            return new PlaylistDB();
+
+        PlaylistDB db = new OPMLParser().readPlaylist(file);
+
+        return db;
+
     }
 
     private void loadSubscriptions() {
@@ -105,6 +121,7 @@ public class DatabaseManager {
     }
 
     public SubscriptionsDB getSubscriptionsDB() { return subscriptionsDB; }
+    public PlaylistDB getPlaylistDB() { return playlistDB; }
 
     public void addSubscription(String title, String link) {
         subscriptionsDB.addSubscription(title, link);

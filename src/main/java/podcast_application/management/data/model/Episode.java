@@ -4,7 +4,11 @@ import java.util.Date;
 
 public class Episode {
     private String title, description, link, duration, progress, guid;
+    private boolean isInPlaylist;
     private Date date;
+
+    public boolean getIsInPlaylist() { return isInPlaylist; }
+    public void setInPlaylist(boolean isInPlaylist) { this.isInPlaylist = isInPlaylist; }
 
     public String getTitle() {
         return title;

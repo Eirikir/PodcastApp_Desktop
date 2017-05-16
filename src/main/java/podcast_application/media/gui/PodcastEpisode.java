@@ -47,6 +47,7 @@ public class PodcastEpisode extends BorderPane {
         filePath = Paths.get(basePath + "/" + fileName);
         this.channelName = channelName;
 
+        this.isInPlaylist = item.getIsInPlaylist();
 
         progress = Formatter.STRING_TO_DURATION(item.getProgress());
         duration = Formatter.STRING_TO_DURATION(item.getDuration());
@@ -55,6 +56,8 @@ public class PodcastEpisode extends BorderPane {
 //        setUpUI();
         loadGUI();
     }
+
+    public boolean getIsInPlaylist() { return isInPlaylist; }
 
     public void toggleDetails() {
         showDetails = (showDetails) ? false : true;
@@ -194,10 +197,13 @@ public class PodcastEpisode extends BorderPane {
         Button playlistBtn = new Button();
         playlistBtn.getStyleClass().add("smallBtnClass");
 
-        if(isInPlaylist)
+        if(isInPlaylist) {
             playlistBtn.setId("playListBtnRemove");
-        else
+            Playlist.getInstance().addEpisode(this);
+        }
+        else {
             playlistBtn.setId("playListBtnAdd");
+        }
 
         playlistBtn.setOnAction((e) -> {
             Playlist list = Playlist.getInstance();

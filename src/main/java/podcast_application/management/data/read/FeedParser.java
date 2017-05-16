@@ -12,6 +12,7 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import podcast_application.database.ChannelDB;
 import podcast_application.database.DatabaseManager;
+import podcast_application.database.PlaylistDB;
 import podcast_application.management.data.model.Channel;
 import podcast_application.management.data.model.Episode;
 
@@ -23,6 +24,7 @@ import java.util.List;
 public class FeedParser {
     private static FeedParser instance = null;
     private final String LINE_SEPARATOR = "\n";
+    private PlaylistDB playlistDB;
 
     private FeedParser() {}
 
@@ -50,6 +52,7 @@ public class FeedParser {
 
             ChannelDB db = DatabaseManager.getInstance().getChannelDatabase(feed.getTitle());
 
+            playlistDB = DatabaseManager.getInstance().getPlaylistDB();
             List<Episode> episodes = new ArrayList<>();
             for (Object entry : feed.getEntries()) {
                 Episode tmp = parseItem((SyndEntry) entry);
@@ -73,6 +76,10 @@ public class FeedParser {
 
         tmp.setGuid(entry.getUri());
         tmp.setTitle(entry.getTitle());
+
+        // is the episode in playlist?
+        boolean isInPlayList = playlistDB.containsKey(entry.getUri());
+        tmp.setInPlaylist(isInPlayList);
 
         // format description (some uses HTML tags)
         String formattedDescription = entry.getDescription().getValue()

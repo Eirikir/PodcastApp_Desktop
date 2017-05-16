@@ -1,6 +1,8 @@
 package podcast_application.management.data.write;
 
+import podcast_application.database.PlaylistDB;
 import podcast_application.database.SubscriptionsDB;
+import podcast_application.management.data.model.PlaylistObject;
 
 import javax.xml.stream.*;
 import java.io.File;
@@ -72,7 +74,54 @@ public class OPMLBuilder {
         }
     }
 
-//    public void writePlaylist(File)
+    public void writePlaylist(File file, PlaylistDB playlistDB) {
+        try {
+            // create an XMLOutputFactory
+            XMLOutputFactory factory = XMLOutputFactory.newInstance();
+
+            // create stream writer
+//            XMLStreamWriter writer = factory.createXMLStreamWriter(new FileWriter(file));
+            XMLStreamWriter writer = factory.createXMLStreamWriter(new FileOutputStream(file), "UTF-8");
+
+            // write start doc and head part
+            writeStart(writer);
+
+            // write body
+            writer.writeDTD(BREAK+TAB);
+            writer.writeStartElement("body");
+
+            // write outlines
+            Map<String, PlaylistObject> playlist = playlistDB.getPlaylist();
+            String guid = null, url = null, channel = null;
+            for (Map.Entry<String, PlaylistObject> entry : playlist.entrySet()) {
+                guid = entry.getKey();
+                url = entry.getValue().getLink();
+                channel = entry.getValue().getChannel();
+
+                writer.writeDTD(BREAK+TAB+TAB);
+                writer.writeEmptyElement("outline");
+                writer.writeAttribute("text", guid);
+                writer.writeAttribute("channel", channel);
+                writer.writeAttribute("type", "audio");
+                writer.writeAttribute("URL", url);
+            }
+
+
+            writer.writeDTD(BREAK+TAB);
+            writer.writeEndElement(); // end body
+
+
+            // end document
+            writer.writeDTD(BREAK);
+            writer.writeEndElement(); // end OPML
+            writer.writeEndDocument();
+
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void writeStart(XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartDocument("UTF-8", "1.0");

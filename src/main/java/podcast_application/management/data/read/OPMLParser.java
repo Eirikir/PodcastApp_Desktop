@@ -1,5 +1,6 @@
 package podcast_application.management.data.read;
 
+import podcast_application.database.PlaylistDB;
 import podcast_application.database.SubscriptionsDB;
 
 import javax.xml.namespace.QName;
@@ -60,5 +61,49 @@ public class OPMLParser {
     }
 
 
+    public PlaylistDB readPlaylist(File file) {
+        final String GUID = "text", LINK = "URL", CHANNEL = "channel";
+        PlaylistDB playlistDB = new PlaylistDB();
+
+        try {
+            // First, create a new XMLInputFactory
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            // Setup a new eventReader
+            InputStream in = new FileInputStream(file);
+            XMLEventReader eventReader = inputFactory.createXMLEventReader(in);
+            // read the xml document
+//            Channel channel = null;
+            String guid = null, link = null, channel = null;
+
+            while(eventReader.hasNext()) {
+                XMLEvent event = eventReader.nextEvent();
+
+                if(event.isStartElement()) {
+                    StartElement startElement = event.asStartElement();
+
+                    // If we have an outline element, we create a new channel
+                    if(startElement.getName().getLocalPart().equals(OUTLINE)) {
+                        guid = event.asStartElement().getAttributeByName(new QName(GUID)).getValue();
+                        link = event.asStartElement().getAttributeByName(new QName(LINK)).getValue();
+                        channel = event.asStartElement().getAttributeByName(new QName(CHANNEL)).getValue();
+                    }
+
+                }
+
+                // If we reach the end of an outline element, we add it to the list
+                if (event.isEndElement()) {
+                    EndElement endElement = event.asEndElement();
+                    if (endElement.getName().getLocalPart().equals(OUTLINE)) {
+                        playlistDB.addToPlaylist(guid, link, channel);
+                    }
+                }
+            }
+            eventReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return playlistDB;
+    }
 
 }

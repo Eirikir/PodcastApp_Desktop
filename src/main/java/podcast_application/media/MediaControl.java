@@ -6,6 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import podcast_application.database.DatabaseManager;
+import podcast_application.database.PlaylistDB;
+import podcast_application.management.data.model.PlaylistObject;
 import podcast_application.media.gui.*;
 import podcast_application.management.helpers.ChannelManager;
 import javafx.beans.InvalidationListener;
@@ -46,7 +48,6 @@ public class MediaControl extends BorderPane {
 //        setLeft(podcastChannelListView);
 
 
-
         Playlist playList = Playlist.getInstance();
 /*        VBox  channelBox = new VBox(playList, podcastChannelListView);
         channelBox.setId("channelBox");
@@ -55,6 +56,7 @@ public class MediaControl extends BorderPane {
         setLeft(channelBox);
 */
         podcastChannelListView.getItems().add(0, playList);
+        channelsMap.put(playList.getChannelTitle(), playList);
         setLeft(podcastChannelListView);
 
         playList.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -285,6 +287,8 @@ public class MediaControl extends BorderPane {
         }
 
         DatabaseManager.getInstance().storeSubscriptions();
+
+
 
         System.out.println("Save done!");
 

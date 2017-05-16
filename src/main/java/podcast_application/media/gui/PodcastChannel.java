@@ -73,4 +73,8 @@ public class PodcastChannel extends ImageView implements ChannelInterface {
         return episodes.get(i);
     }
 
+    public PodcastEpisode getEpisodeById(String guid) {
+        return episodes.stream().filter(x -> x.getGuid().equals(guid)).findFirst().get();
+    }
+
 }

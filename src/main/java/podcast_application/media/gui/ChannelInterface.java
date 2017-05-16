@@ -8,6 +8,7 @@ public interface ChannelInterface {
     public int getAmountOfEpisodes();
     public List<PodcastEpisode> getEpisodes();
     public PodcastEpisode getEpisode(int idx);
+    public PodcastEpisode getEpisodeById(String guid);
     public String getChannelDescription();
     public void save();
 }
