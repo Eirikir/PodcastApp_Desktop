@@ -85,7 +85,7 @@ public class OPMLParser {
                     if(startElement.getName().getLocalPart().equals(OUTLINE)) {
                         guid = event.asStartElement().getAttributeByName(new QName(GUID)).getValue();
                         link = event.asStartElement().getAttributeByName(new QName(LINK)).getValue();
-                        channel = event.asStartElement().getAttributeByName(new QName(CHANNEL)).getValue();
+//                        channel = event.asStartElement().getAttributeByName(new QName(CHANNEL)).getValue();
                     }
 
                 }
@@ -94,7 +94,7 @@ public class OPMLParser {
                 if (event.isEndElement()) {
                     EndElement endElement = event.asEndElement();
                     if (endElement.getName().getLocalPart().equals(OUTLINE)) {
-                        playlistDB.addToPlaylist(guid, link, channel);
+                        playlistDB.addToPlaylist(guid, link);
                     }
                 }
             }

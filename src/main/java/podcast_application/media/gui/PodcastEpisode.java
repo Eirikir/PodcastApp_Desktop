@@ -5,11 +5,14 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.text.*;
 import javafx.util.Duration;
+import podcast_application.database.DatabaseManager;
+import podcast_application.management.data.model.EpisodeTracking;
 import podcast_application.management.helpers.DownloadManager;
 import podcast_application.management.helpers.Formatter;
 import podcast_application.management.data.model.Episode;
@@ -24,8 +27,8 @@ public class PodcastEpisode extends BorderPane {
     private Path filePath;
     private String title, description, pubDate, link, guid, channelName;
     private Duration progress, duration;
-    private boolean downloading = false, isInPlaylist = false;
-    private Button fileBtn;
+    private boolean downloading = false, isInPlaylist = false, isDone = false;
+    private Button fileBtn, progressBtn;
 
     // for details view
     Label descLabel;
@@ -48,6 +51,7 @@ public class PodcastEpisode extends BorderPane {
         this.channelName = channelName;
 
         this.isInPlaylist = item.getIsInPlaylist();
+        this.isDone = item.getIsDone();
 
         progress = Formatter.STRING_TO_DURATION(item.getProgress());
         duration = Formatter.STRING_TO_DURATION(item.getDuration());
@@ -64,16 +68,21 @@ public class PodcastEpisode extends BorderPane {
         descLabel.setWrapText(showDetails);
     }
 
+
+
     private void loadGUI() {
+        // progress information
+        createProgressBtn();
 
-        Button progressBtn = new Button();
-        progressBtn.setPadding(new Insets(0,20,0,0));
-        progressBtn.getStyleClass().add("progressBtnClass");
-        if(progress == Duration.ZERO)
-            progressBtn.setId("progressUnplayed");
-        else
-            progressBtn.setId("progressNotDone");
 
+/*        progressBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(event.getButton() == MouseButton.SECONDARY)
+
+            }
+        });
+*/
         // Title and overview info
         Label titleLabel = new Label(title);
         titleLabel.setId("episodeTitleLabel");
@@ -138,22 +147,29 @@ public class PodcastEpisode extends BorderPane {
 //        setMargin(descLabel, new Insets(5,0,0,0));
         setPadding(new Insets(5,0,0,0));
 
-/*
-        infoBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String tmp = infoBtn.getId();
-                if(tmp.equals("infoBtnDown")) {
-                    infoBtn.setId("infoBtnUp");
-                    descLabel.setWrapText(true);
-                    return;
-                }
+    }
 
-                infoBtn.setId("infoBtnDown");
-                descLabel.setWrapText(false);
-            }
-        });
-*/
+    private void createProgressBtn() {
+        progressBtn = new Button();
+        progressBtn.setPadding(new Insets(0,20,0,0));
+        progressBtn.getStyleClass().add("progressBtnClass");
+        if(isDone)
+            progressBtn.setId("progressDone");
+        else if(progress == Duration.ZERO)
+            progressBtn.setId("progressUnplayed");
+        else
+            progressBtn.setId("progressNotDone");
+
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem item1 = new MenuItem("Mark as Played");
+        item1.setOnAction((e) -> { setIsDone(true); });
+
+        MenuItem item2 = new MenuItem("Mark as Unplayed");
+        item2.setOnAction((e) -> { setIsDone(false); });
+
+        contextMenu.getItems().addAll(item1, item2);
+        progressBtn.setContextMenu(contextMenu);
     }
 
 
@@ -221,6 +237,20 @@ public class PodcastEpisode extends BorderPane {
         });
 
         return playlistBtn;
+    }
+
+    public void setIsDone(boolean value) {
+        isDone = value;
+        progress = Duration.ZERO; // nullify progress in both cases
+
+        if(value)
+            progressBtn.setId("progressDone");
+        else
+            progressBtn.setId("progressUnplayed");
+
+        EpisodeTracking tmp = new EpisodeTracking(Formatter.DURATION_TO_STRING(progress), isDone);
+        DatabaseManager.getInstance().getChannelDatabase(channelName).addEpisode(guid, tmp);
+
     }
 
 

@@ -2,12 +2,10 @@ package podcast_application.management.data.write;
 
 import podcast_application.database.PlaylistDB;
 import podcast_application.database.SubscriptionsDB;
-import podcast_application.management.data.model.PlaylistObject;
 
 import javax.xml.stream.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.util.Map;
 
 /**
@@ -91,17 +89,17 @@ public class OPMLBuilder {
             writer.writeStartElement("body");
 
             // write outlines
-            Map<String, PlaylistObject> playlist = playlistDB.getPlaylist();
+            Map<String, String> playlist = playlistDB.getPlaylist();
             String guid = null, url = null, channel = null;
-            for (Map.Entry<String, PlaylistObject> entry : playlist.entrySet()) {
+            for (Map.Entry<String, String> entry : playlist.entrySet()) {
                 guid = entry.getKey();
-                url = entry.getValue().getLink();
-                channel = entry.getValue().getChannel();
+                url = entry.getValue();
+//                channel = entry.getValue().getChannel();
 
                 writer.writeDTD(BREAK+TAB+TAB);
                 writer.writeEmptyElement("outline");
                 writer.writeAttribute("text", guid);
-                writer.writeAttribute("channel", channel);
+//                writer.writeAttribute("channel", channel);
                 writer.writeAttribute("type", "audio");
                 writer.writeAttribute("URL", url);
             }

@@ -1,5 +1,6 @@
 package podcast_application.database;
 
+import podcast_application.management.data.model.EpisodeTracking;
 import podcast_application.management.data.read.OPMLParser;
 import podcast_application.management.data.write.OPMLBuilder;
 import podcast_application.management.dropbox.DropboxManager;
@@ -8,13 +9,16 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DatabaseManager {
     private static DatabaseManager instance = null;
-//    private final String DB_NAME = "/db.dat";
-//    private final String BASE_PATH = "./Podcasts/";
     private SubscriptionsDB subscriptionsDB;
     private PlaylistDB playlistDB;
+    private Map<String, ChannelDB> channelDatabaseList = new HashMap<>();
     private boolean subscriptionsAltered = false; // to know whether we should save / sync db
     private boolean useDropbox = false; // should we sync through dropbox?
     private final String BASE_PATH = "./Podcasts/",
@@ -95,11 +99,18 @@ public class DatabaseManager {
     }
 
     public ChannelDB getChannelDatabase(String path) {
+        if(channelDatabaseList.containsKey(path))
+            return channelDatabaseList.get(path);
+
         String dbPath = BASE_PATH + path + DB_NAME;
-        if(Files.notExists(Paths.get(dbPath)))
-            return new ChannelDB();
+        if(Files.notExists(Paths.get(dbPath))) {
+            ChannelDB db = new ChannelDB();
+            channelDatabaseList.put(path, db);
+            return db;
+        }
 
         ChannelDB db = null;
+        channelDatabaseList.put(path, db);
 
         // read database file
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dbPath))) {
@@ -110,6 +121,7 @@ public class DatabaseManager {
             return db;
         }
     }
+
 
     public void storeDatabase(ChannelDB db, String path) {
         String dbPath = path + DB_NAME;

@@ -2,6 +2,7 @@ package podcast_application.media.gui;
 
 import podcast_application.database.ChannelDB;
 import podcast_application.database.DatabaseManager;
+import podcast_application.management.data.model.EpisodeTracking;
 import podcast_application.management.helpers.Formatter;
 import podcast_application.management.data.model.Channel;
 import podcast_application.management.data.model.Episode;
@@ -15,7 +16,6 @@ import java.util.List;
 public class PodcastChannel extends ImageView implements ChannelInterface {
     private List<PodcastEpisode> episodes = new ArrayList<>();
     private ChannelDB database;
-    private boolean hasDBBeenAltered = false;
     private File directory, episodesList;
     private String channelTitle, channelDescription, sourceRSS;
 
@@ -45,13 +45,14 @@ public class PodcastChannel extends ImageView implements ChannelInterface {
     public void storeEpisodeProgress(PodcastEpisode ep) {
         String dur = Formatter.DURATION_TO_STRING(ep.getProgress());
         System.out.println("storing to "+channelTitle);
-        database.addEpisode(ep.getGuid(), Formatter.DURATION_TO_STRING(ep.getProgress()));
-        if(!hasDBBeenAltered)
-            hasDBBeenAltered = true;
+
+        database.addEpisode(ep.getGuid(),
+                new EpisodeTracking(Formatter.DURATION_TO_STRING(ep.getProgress())));
     }
 
     public void save() {
-        if(database.getAmountOfStoredItems() == 0 || !hasDBBeenAltered)
+//        if(database.getAmountOfStoredItems() == 0 || !hasDBBeenAltered)
+        if(database.getAmountOfStoredItems() == 0)
             return;
         System.out.println("Saving episodes of channel '"+channelTitle+"'");
 

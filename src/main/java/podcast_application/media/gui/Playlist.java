@@ -1,5 +1,6 @@
 package podcast_application.media.gui;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import podcast_application.database.DatabaseManager;
@@ -39,7 +40,7 @@ public class Playlist extends ImageView implements ChannelInterface {
 
     public void addEpisode(PodcastEpisode episode) {
         episodes.add(episode);
-        playlistDB.addToPlaylist(episode.getGuid(), episode.getLink(), episode.getChannelName());
+        playlistDB.addToPlaylist(episode.getGuid(), episode.getLink());
         if(!hasBeenAltered) hasBeenAltered = true;
         System.out.println("Adding: "+hasBeenAltered);
     }

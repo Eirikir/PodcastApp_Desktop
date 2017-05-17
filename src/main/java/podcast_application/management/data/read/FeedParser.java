@@ -15,6 +15,7 @@ import podcast_application.database.DatabaseManager;
 import podcast_application.database.PlaylistDB;
 import podcast_application.management.data.model.Channel;
 import podcast_application.management.data.model.Episode;
+import podcast_application.management.data.model.EpisodeTracking;
 
 import java.io.File;
 import java.net.URL;
@@ -56,8 +57,10 @@ public class FeedParser {
             List<Episode> episodes = new ArrayList<>();
             for (Object entry : feed.getEntries()) {
                 Episode tmp = parseItem((SyndEntry) entry);
-                String progress = db.getProgressOfID(tmp.getGuid());
-                tmp.setProgress(progress);
+//                String progress = db.getTrackingOfID(tmp.getGuid());
+                EpisodeTracking tracking = db.getTrackingOfID(tmp.getGuid());
+                tmp.setProgress(tracking.getProgress());
+                tmp.setIsDone(tracking.getIsDone());
                 episodes.add(tmp);
             }
 

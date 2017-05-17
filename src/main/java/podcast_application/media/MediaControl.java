@@ -1,13 +1,8 @@
 package podcast_application.media;
 
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.VBox;
 import podcast_application.database.DatabaseManager;
-import podcast_application.database.PlaylistDB;
-import podcast_application.management.data.model.PlaylistObject;
 import podcast_application.media.gui.*;
 import podcast_application.management.helpers.ChannelManager;
 import javafx.beans.InvalidationListener;
@@ -19,7 +14,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 
 import java.util.*;
@@ -29,7 +23,7 @@ public class MediaControl extends BorderPane {
     private PodcastEpisode currentEpisode;
     private PodcastEpisode currentlySelected = null; // for toggling details
 //    private MediaView mediaView;
-    private final boolean repeat = false;
+//    private final boolean repeat = false;
     private boolean stopRequested = false;
     private boolean atEndOfMedia = false;
     private Map<String, ChannelInterface> channelsMap = new HashMap<>();
@@ -45,18 +39,11 @@ public class MediaControl extends BorderPane {
         ListView<ChannelInterface> podcastChannelListView = channelManager.getChannelListView();
 
         channelsMap = channelManager.getChannelsMap();
-//        setLeft(podcastChannelListView);
-
 
         Playlist playList = Playlist.getInstance();
-/*        VBox  channelBox = new VBox(playList, podcastChannelListView);
-        channelBox.setId("channelBox");
-        channelBox.setAlignment(Pos.TOP_CENTER);
 
-        setLeft(channelBox);
-*/
-        podcastChannelListView.getItems().add(0, playList);
-        channelsMap.put(playList.getChannelTitle(), playList);
+        podcastChannelListView.getItems().add(0, playList); // add playlist first
+        channelsMap.put(playList.getChannelTitle(), playList); // so we can use save method
         setLeft(podcastChannelListView);
 
         playList.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -249,18 +236,16 @@ public class MediaControl extends BorderPane {
 
         mediaPlayer.setCycleCount(1);
 
-/*        mediaPlayer.setCycleCount(repeat ? MediaPlayer.INDEFINITE : 1);
+//        mediaPlayer.setCycleCount(repeat ? MediaPlayer.INDEFINITE : 1);
         mediaPlayer.setOnEndOfMedia(new Runnable() {
             @Override
             public void run() {
-                if (!repeat) {
-                    playButton.setText(">");
-                    stopRequested = true;
-                    atEndOfMedia = true;
-                }
+                currentEpisode.setIsDone(true);
+                stopRequested = true;
+                atEndOfMedia = true;
             }
         });
-*/
+
 
         setBottom(mediaBar);
     }
