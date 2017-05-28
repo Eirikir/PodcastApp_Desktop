@@ -57,9 +57,10 @@ public class DropboxManager {
 
     }
 
-    public boolean getFile(File file) {
+    public boolean getFile(File file, String parent) {
         boolean ret = false;
-        String path = "/"+file.getParent().substring(2)+"/"+file.getName();
+//        String path = "/"+file.getParent().substring(2)+"/"+file.getName();
+        String path = parent + file.getName();
 
         try {
             Metadata meta = client.files().getMetadata(path);
@@ -80,8 +81,11 @@ public class DropboxManager {
         return ret;
     }
 
-    public void syncFile(File file) {
-        String path = "/"+file.getParent().substring(2)+"/"+file.getName();
+    public void syncFile(File file, String parent) {
+//        String path = "/"+file.getParent().substring(2)+"/"+file.getName();
+        String path = parent + file.getName();
+
+
 //        System.out.println(path);
 
         try {

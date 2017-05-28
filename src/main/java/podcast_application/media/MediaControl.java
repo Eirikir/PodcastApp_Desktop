@@ -272,6 +272,7 @@ public class MediaControl extends BorderPane {
         }
 
         DatabaseManager.getInstance().storeSubscriptions();
+        DatabaseManager.getInstance().syncFiles();
 
 
 

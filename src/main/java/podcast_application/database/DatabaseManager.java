@@ -20,18 +20,19 @@ public class DatabaseManager {
     private PlaylistDB playlistDB;
     private Map<String, ChannelDB> channelDatabaseList = new HashMap<>();
     private boolean subscriptionsAltered = false; // to know whether we should save / sync db
-    private boolean useDropbox = false; // should we sync through dropbox?
+    private boolean useDropbox = true; // should we sync through dropbox?
     private final String BASE_PATH = "./Podcasts/",
             SUBSCRIPTIONS_PATH = BASE_PATH+"subscriptions.opml", PLAYLIST_PATH = BASE_PATH+"playlist.opml",
             DB_NAME = "/db.dat";
 
     private DatabaseManager() {
-        playlistDB = loadPlaylist();
+        loadFiles();
+//        loadPlaylist();
 
         // load subscriptions file
-        loadSubscriptions();
+//        loadSubscriptions();
     }
-
+/*
     private PlaylistDB loadPlaylist() {
         File file = new File(PLAYLIST_PATH);
         if(!file.exists())
@@ -42,13 +43,45 @@ public class DatabaseManager {
         return db;
 
     }
+*/
+    private void loadPlaylist(DropboxManager dropboxManager) {
+        final String PARENT = "/Podcasts/";
+        File playFile = new File(PLAYLIST_PATH);
 
-    private void loadSubscriptions() {
+        if(!playFile.exists()) {  // no local file
+            if (!useDropbox)
+                playlistDB = new PlaylistDB();
+            else if(!dropboxManager.getFile(playFile, PARENT))
+                playlistDB = new PlaylistDB();
+        }
+
+
+
+        if(useDropbox)
+            dropboxManager.syncFile(playFile, PARENT);
+
+        playlistDB = new OPMLParser().readPlaylist(playFile);
+
+    }
+
+    private void loadFiles() {
         if(Files.notExists(Paths.get(BASE_PATH))) // create 'Podcasts' dir if not present
             new File(BASE_PATH).mkdir();
 
-
         DropboxManager dropboxManager = new DropboxManager();
+
+        // code for playlist file
+        loadPlaylist(dropboxManager);
+
+        // load subscriptions file
+        loadSubscriptions(dropboxManager);
+    }
+
+    private void loadSubscriptions(DropboxManager dropboxManager) {
+//        if(Files.notExists(Paths.get(BASE_PATH))) // create 'Podcasts' dir if not present
+//            new File(BASE_PATH).mkdir();
+
+        final String PARENT = "/Podcasts/";
 
         File subFile = new File(SUBSCRIPTIONS_PATH);
         // does the file exist locally?
@@ -56,20 +89,14 @@ public class DatabaseManager {
             if(!useDropbox)
                 writeDefaultFiles();
 
-            else if (!dropboxManager.getFile(subFile)) // no dropbox file
+            else if (!dropboxManager.getFile(subFile, PARENT)) // no dropbox file
                 writeDefaultFiles();
-
-//            writeDefaultFiles();
         }
 
-//        subscriptionsDB = new ReadWriteSubscriptions().readSubscriptionsFile(subFile);
         subscriptionsDB = new OPMLParser().readSubscriptions(subFile);
 
-
-//        readSubscriptionsFile(subFile);
-
         if(useDropbox)
-            dropboxManager.syncFile(subFile); // sync file based on last modification
+            dropboxManager.syncFile(subFile, PARENT); // sync file based on last modification
 
     }
 
@@ -99,8 +126,46 @@ public class DatabaseManager {
     }
 
     public ChannelDB getChannelDatabase(String path) {
-        if(channelDatabaseList.containsKey(path))
+        if(channelDatabaseList.containsKey(path)) // if the channel is already loaded
             return channelDatabaseList.get(path);
+
+
+        ChannelDB channelDB = null;
+        String tmpPath = "/Podcasts/" + (path.replaceAll(" ", "_")) + "_";
+        DropboxManager dropboxManager = new DropboxManager();
+
+        File file = new File(BASE_PATH + path + DB_NAME);
+        // does the file exist locally?
+        if(!file.exists()) { // no local file
+            if (!useDropbox)
+                channelDB = new ChannelDB();
+            else if(!dropboxManager.getFile(file, tmpPath))
+                channelDB = new ChannelDB();
+        }
+
+        channelDatabaseList.put(path, channelDB);
+
+        if(!file.exists())
+            return channelDB;
+
+        // file exist... sync if neccessary and build database from file contents
+        if(useDropbox)
+            dropboxManager.syncFile(file, tmpPath);
+
+        // read database file
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            channelDB = (ChannelDB) ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            return channelDB;
+        }
+
+        // exists in dropbox?
+/*        String tmpPath = "/Podcasts/" + (path.replaceAll(" ", "_")) + "_";
+        DropboxManager drop = new DropboxManager();
+        if(drop.getFile(new File(BASE_PATH + path + DB_NAME), tmpPath))
+            System.out.println("hola: "+tmpPath);
 
         String dbPath = BASE_PATH + path + DB_NAME;
         if(Files.notExists(Paths.get(dbPath))) {
@@ -120,6 +185,9 @@ public class DatabaseManager {
         } finally {
             return db;
         }
+*/
+
+//        dropbox.syncFile(new File(dbPath), "/Podcasts/"+channelName);
     }
 
 
@@ -157,6 +225,33 @@ public class DatabaseManager {
             System.out.println("not found...");
     }
 
+    public void syncFiles() { // sync with dropbox
+        // sync database
+        if(useDropbox) {
+//            new DropboxManager().syncFile(file);
+            DropboxManager dropbox = new DropboxManager();
+            if(subscriptionsAltered)
+                dropbox.syncFile(new File(SUBSCRIPTIONS_PATH), "/Podcasts/");
+
+            dropbox.syncFile(new File(PLAYLIST_PATH), "/Podcasts/");
+
+            // channel databases
+            String dbPath, channelName;
+            for (Map.Entry<String, ChannelDB> entry : channelDatabaseList.entrySet()) {
+                dbPath = BASE_PATH + entry.getKey() + DB_NAME; // local path
+
+                channelName = (entry.getKey().replaceAll(" ", "_")) + "_";
+
+                File tmp = new File(dbPath);
+                if(tmp.exists()) {
+//                    System.out.println("Parent: "+tmp.getParent());
+//                    System.out.println("Name: "+tmp.getName());
+                    dropbox.syncFile(new File(dbPath), "/Podcasts/"+channelName);
+                }
+            }
+        }
+    }
+
     public void storeSubscriptions() {
         if(!subscriptionsAltered)
             return;
@@ -170,8 +265,9 @@ public class DatabaseManager {
         System.out.println("Subscriptions saved");
 
         // sync database
-        if(useDropbox)
-            new DropboxManager().syncFile(file);
+//        if(useDropbox)
+//            new DropboxManager().syncFile(file);
+
     }
 
     public static DatabaseManager getInstance() {
