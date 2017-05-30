@@ -20,7 +20,7 @@ public class DatabaseManager {
     private PlaylistDB playlistDB;
     private Map<String, ChannelDB> channelDatabaseList = new HashMap<>();
     private boolean subscriptionsAltered = false; // to know whether we should save / sync db
-    private boolean useDropbox = true; // should we sync through dropbox?
+    private boolean useDropbox = false; // should we sync through dropbox?
     private final String BASE_PATH = "./Podcasts/",
             SUBSCRIPTIONS_PATH = BASE_PATH+"subscriptions.opml", PLAYLIST_PATH = BASE_PATH+"playlist.opml",
             DB_NAME = "/db.dat";
